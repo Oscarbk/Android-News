@@ -20,25 +20,26 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        // Disable search button until input is detected
         search = findViewById(R.id.search)
         searchBar = findViewById(R.id.searchBar)
-
         search.setEnabled(false)
         search.setOnClickListener {
+            startActivity(intent)
+            val intent = Intent(this, NewsActivity::class.java)
             startActivity(intent)
         }
         searchBar.addTextChangedListener(TextWatcher)
     }
+    // Detect when search bar has input
     private val TextWatcher: TextWatcher = object : TextWatcher {
         override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
         }
-
         override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
             val inputtedSearch = searchBar.getText().toString()
             val enabledButton = inputtedSearch.isNotEmpty()
             search.setEnabled(enabledButton)
         }
-
         override fun afterTextChanged(s: Editable?) {
         }
 
