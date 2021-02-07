@@ -7,9 +7,7 @@ import android.text.TextWatcher
 import android.widget.Button
 
 import android.content.Intent
-import android.util.Log
 import android.widget.EditText
-import android.widget.ProgressBar
 
 class MainActivity : AppCompatActivity() {
 
@@ -26,7 +24,7 @@ class MainActivity : AppCompatActivity() {
         search.setEnabled(false)
         search.setOnClickListener {
             startActivity(intent)
-            val intent = Intent(this, NewsActivity::class.java)
+            val intent = Intent(this, SourceActivity::class.java)
             startActivity(intent)
         }
         searchBar.addTextChangedListener(TextWatcher)
