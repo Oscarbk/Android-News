@@ -11,6 +11,10 @@ class SourceActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_source)
 
+        val intent = getIntent()
+        val term: String = intent.getStringExtra("TERM")!!
+        setTitle("Search for $term")
+
         val spinner: Spinner = findViewById(R.id.spinner)
         // Create an ArrayAdapter using the string array and a default spinner layout
         ArrayAdapter.createFromResource(
