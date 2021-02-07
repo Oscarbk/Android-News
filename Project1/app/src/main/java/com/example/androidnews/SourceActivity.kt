@@ -20,6 +20,7 @@ class SourceActivity : AppCompatActivity() {
         val term: String = intent.getStringExtra("TERM")!!
         setTitle("Search for $term")
 
+        // The following code snippet is adapted from the android developer documentation on Spinners
         recyclerView = findViewById(R.id.recyclerView)
         val sources = getFakeSources()
         val adapter = SourcesAdapter(sources)
@@ -43,64 +44,44 @@ class SourceActivity : AppCompatActivity() {
     fun getFakeSources(): List<Source> {
         return listOf(
             Source(
-                handle = "@nickcapurso",
-                username = "Nick Capurso",
-                content = "We're learning lists!",
-                iconUrl = "https://...."
+                username = "iaculis nunc",
+                content = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Eu ultrices vitae auctor eu augue ut lectus. Sollicitudin tempor id eu nisl. Diam volutpat commodo sed egestas egestas fringilla.",
             ),
             Source(
-                username = "Android Central",
-                handle = "@androidcentral",
-                content = "NVIDIA Shield TV vs. Shield TV Pro: Which should I buy?",
-                iconUrl = "https://...."
+                username = "aliquet porttitor",
+                content = "Odio ut enim blandit volutpat maecenas volutpat blandit.",
             ),
             Source(
-                username = "DC Android",
-                handle = "@DCAndroid",
-                content = "FYI - another great integration for the @Firebase platform",
-                iconUrl = "https://...."
+                username = "tincidunt tortor",
+                content = "Luctus accumsan tortor posuere ac ut consequat semper viverra.",
             ),
             Source(
-                username = "KotlinConf",
-                handle = "@kotlinconf",
-                content = "Can't make it to KotlinConf this year? We have a surprise for you. We'll be live streaming the keynotes, closing panel and an entire track over the 2 main conference days. Sign-up to get notified once we go live!",
-                iconUrl = "https://...."
+                username = "tellus elementum",
+                content = "Urna condimentum mattis pellentesque id nibh. Sollicitudin aliquam ultrices sagittis orci a scelerisque. Egestas integer eget aliquet nibh praesent tristique magna sit amet.",
             ),
             Source(
-                username = "Android Summit",
-                handle = "@androidsummit",
-                content = "What a #Keynote! @SlatteryClaire is the Director of Performance at Speechless, and that's exactly how she left us after her amazing (and interactive!) #keynote at #androidsummit. #DCTech #AndroidDev #Android",
-                iconUrl = "https://...."
+                username = "ante in",
+                content = "Cras adipiscing enim eu turpis egestas pretium.",
             ),
             Source(
-                username = "Fragmented Podcast",
-                handle = "@FragmentedCast",
-                content = ".... annnnnnnnnd we're back!\n\nThis week @donnfelker talks about how it's Ok to not know everything and how to set yourself up mentally for JIT (Just In Time [learning]). Listen in here: \nhttp://fragmentedpodcast.com/episodes/135/ ",
-                iconUrl = "https://...."
+                username = "sociis natoque",
+                content = "Purus semper eget duis at tellus at urna condimentum. Urna condimentum mattis pellentesque id nibh tortor id.",
             ),
             Source(
-                username = "Jake Wharton",
-                handle = "@JakeWharton",
-                content = "Free idea: location-aware physical password list inside a password manager. Mostly for garage door codes and the like. I want to open my password app, switch to the non-URL password section, and see a list of things sorted by physical distance to me.",
-                iconUrl = "https://...."
+                username = "lorem ipsum",
+                content = "Adipiscing bibendum est ultricies integer quis auctor elit sed vulputate.",
             ),
             Source(
-                username = "Droidcon Boston",
-                handle = "@droidconbos",
-                content = "#DroidconBos will be back in Boston next year on April 8-9!",
-                iconUrl = "https://...."
+                username = "aliquam etiam",
+                content = "Elementum sagittis vitae et leo duis ut diam quam.",
             ),
             Source(
-                username = "AndroidWeekly",
-                handle = "@androidweekly",
-                content = "Latest Android Weekly Issue 327 is out!\nhttp://androidweekly.net/ #latest-issue  #AndroidDev",
-                iconUrl = "https://...."
+                username = "euismod nisi",
+                content = "Proin sagittis nisl rhoncus mattis rhoncus urna. Vitae tortor condimentum lacinia quis vel eros donec ac odio.",
             ),
             Source(
-                username = ".droidconSF",
-                handle = "@droidconSF",
-                content = "Drum roll please.. Announcing droidcon SF 2018! November 19-20 @ Mission Bay Conference Center. Content and programming by @tsmith & @joenrv.",
-                iconUrl = "https://...."
+                username = "quisque id",
+                content = "Dignissim sodales ut eu sem integer vitae justo.",
             )
         )
     }

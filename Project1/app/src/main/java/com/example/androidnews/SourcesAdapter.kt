@@ -30,10 +30,7 @@ class SourcesAdapter(val sources: List<Source>) : RecyclerView.Adapter<SourcesAd
         // for position indicated -- override the UI elements with the correct data
         val currentSource = sources[position]
         holder.username.text = currentSource.username
-        holder.handle.text = currentSource.handle
         holder.content.text = currentSource.content
-
-        // TODO -- load the image icon url
     }
 
     override fun getItemCount(): Int {
@@ -43,8 +40,6 @@ class SourcesAdapter(val sources: List<Source>) : RecyclerView.Adapter<SourcesAd
 
     class ViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
         val username: TextView = itemView.findViewById(R.id.username)
-        val handle: TextView = itemView.findViewById(R.id.handle)
         val content: TextView = itemView.findViewById(R.id.tweet_content)
-        val icon: ImageView = itemView.findViewById(R.id.icon)
     }
 }
