@@ -2,13 +2,19 @@ package com.example.androidnews
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+
+import android.location.Address
+import android.location.Geocoder
+import android.util.Log
+import android.widget.Toast
+import org.jetbrains.anko.doAsync
+
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
@@ -35,9 +41,58 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
 
-        // Add a marker in Sydney and move the camera
-        val sydney = LatLng(-34.0, 151.0)
-        mMap.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney))
+        mMap.setOnMapLongClickListener { coords: LatLng ->
+            mMap.clear()
+
+            doAsync {
+                // Geocoding should be done on a background thread - it involves networking
+                // and has the potential to cause the app to freeze (Application Not Responding error)
+                // if done on the UI Thread and it takes too long.
+                val geocoder: Geocoder = Geocoder(this@MapsActivity)
+
+                // In Kotlin, you can assign the result of a try-catch block. Both the "try" and
+                // "catch" clauses need to yield a valid value to assign.
+                val results: List<Address> = try {
+                    geocoder.getFromLocation(
+                        coords.latitude,
+                        coords.longitude,
+                        10
+                    )
+                } catch (e: Exception) {
+                    Log.e("MapsActivity", "Geocoder failed", e)
+                    listOf<Address>()
+                }
+
+                // Move back to the UI Thread now that we have some results to show.
+                // The UI can only be updated from the UI Thread.
+                runOnUiThread {
+                    if (results.isNotEmpty()) {
+                        // Potentially, we could show all results to the user to choose from,
+                        // but for our usage it's sufficient enough to just use the first result
+                        val firstResult = results.first()
+                        val postalAddress = firstResult.getAddressLine(0)
+
+                        val toast = Toast.makeText(
+                            this@MapsActivity,
+                            "You clicked: $postalAddress",
+                            Toast.LENGTH_LONG
+                        )
+                        toast.show()
+
+                        // Add a map marker where the user tapped and pan the camera over
+                        mMap.addMarker(MarkerOptions().position(coords).title(postalAddress))
+                        mMap.moveCamera(CameraUpdateFactory.newLatLng(coords))
+                    } else {
+                        Log.d("MapsActivity", "No results from geocoder!")
+                        val toast = Toast.makeText(
+                            this@MapsActivity,
+                            "No results for location!",
+                            Toast.LENGTH_LONG
+                        )
+                        toast.show()
+                    }
+                }
+            }
+        }
     }
 }
