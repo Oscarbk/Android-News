@@ -13,21 +13,31 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var search: Button
     private lateinit var searchBar: EditText
+    private lateinit var maps:  Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        // Disable search button until input is detected
+        // Get buttons on main activity
         search = findViewById(R.id.search)
         searchBar = findViewById(R.id.searchBar)
+        maps = findViewById(R.id.viewMap)
         search.setEnabled(false)
+
+        // Go to sources activity
         search.setOnClickListener {
             val intent = Intent(this, SourceActivity::class.java)
             intent.putExtra("TERM", searchBar.getText().toString())
             startActivity(intent)
         }
         searchBar.addTextChangedListener(TextWatcher)
+
+        // Go to maps activity
+        maps.setOnClickListener {
+            val intent = Intent(this, MapsActivity:: class.java)
+            startActivity(intent)
+        }
     }
     // Detect when search bar has input
     private val TextWatcher: TextWatcher = object : TextWatcher {
