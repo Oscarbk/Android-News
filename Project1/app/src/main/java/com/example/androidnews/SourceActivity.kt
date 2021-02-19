@@ -20,7 +20,6 @@ class SourceActivity : AppCompatActivity() {
         val term: String = intent.getStringExtra("TERM")!!
         setTitle("Search for $term")
 
-        // The following code snippet is adapted from the android developer documentation on Spinners
         recyclerView = findViewById(R.id.recyclerView)
         val sources = getFakeSources()
         val adapter = SourcesAdapter(sources)
@@ -28,6 +27,7 @@ class SourceActivity : AppCompatActivity() {
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(this)
 
+        // The following code snippet is adapted from the android developer documentation on Spinners
         val spinner: Spinner = findViewById(R.id.spinner)
         // Create an ArrayAdapter using the string array and a default spinner layout
         ArrayAdapter.createFromResource(
@@ -85,6 +85,4 @@ class SourceActivity : AppCompatActivity() {
             )
         )
     }
-
-
 }
