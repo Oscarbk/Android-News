@@ -85,6 +85,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                         // but for our usage it's sufficient enough to just use the first result
                         val firstResult = results.first()
                         val postalAddress = firstResult.getAddressLine(0)
+                        setTitle("Search for $postalAddress")
 
                         val toast = Toast.makeText(
                             this@MapsActivity,
