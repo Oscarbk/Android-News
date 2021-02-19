@@ -23,7 +23,6 @@ class MainActivity : AppCompatActivity() {
         searchBar = findViewById(R.id.searchBar)
         search.setEnabled(false)
         search.setOnClickListener {
-            startActivity(intent)
             val intent = Intent(this, SourceActivity::class.java)
             intent.putExtra("TERM", searchBar.getText().toString())
             startActivity(intent)
