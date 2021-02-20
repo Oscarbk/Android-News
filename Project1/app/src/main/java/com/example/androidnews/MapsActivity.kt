@@ -21,12 +21,30 @@ import androidx.recyclerview.widget.RecyclerView
 import org.jetbrains.anko.doAsync
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.logging.HttpLoggingInterceptor
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var mMap: GoogleMap
-
     private lateinit var recyclerView: RecyclerView
+
+    // OkHttp is a library used to make network calls
+  //  val okHttpClient: OkHttpClient = OkHttpClient.Builder().build()
+    private val okHttpClient: OkHttpClient
+    init {
+        val builder = OkHttpClient.Builder()
+
+        // This causes all network traffic to be logged to the console
+        val logging = HttpLoggingInterceptor()
+        logging.level = HttpLoggingInterceptor.Level.BODY
+        builder.addInterceptor(logging)
+
+        okHttpClient = builder.build()
+
+    }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -86,13 +104,21 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                         // but for our usage it's sufficient enough to just use the first result
                         val firstResult = results.first()
                         val postalAddress = firstResult.getAddressLine(0)
-                        setTitle("Search for $postalAddress")
+
+                        setTitle("Search for ${firstResult.adminArea}")
 
                         val toast = Toast.makeText(
                             this@MapsActivity,
                             "You clicked: $postalAddress",
                             Toast.LENGTH_LONG
                         )
+
+                        // Network call needs to be on another thread
+                        doAsync {
+                            retrieveSource(firstResult.adminArea)
+                        }
+
+                        // Display sources when a pin is dropped
                         val sources = getFakeSources()
                         val adapter = SourcesAdapter(sources)
 
@@ -159,5 +185,17 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 content = "Dignissim sodales ut eu sem integer vitae justo.",
             )
         )
+    }
+
+    // This function must be called from a background thread since it will be doing some networking
+    fun retrieveSource(location: String): List<Source>?
+    {
+        // Building the request
+        val request = Request.Builder()
+                .url("https://newsapi.org/v2/everything?q=$location&sortBy=popularity&apiKey=bdc116a1bab1437fbd328fe64fe80558")
+                .build()
+        // Actually makes the API call, blocking the thread until it completes
+        val response = okHttpClient.newCall(request).execute()
+        return null
     }
 }
