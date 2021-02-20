@@ -24,6 +24,7 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.logging.HttpLoggingInterceptor
+import org.json.JSONObject
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
@@ -115,15 +116,14 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
                         // Network call needs to be on another thread
                         doAsync {
-                            retrieveSource(firstResult.adminArea)
+                            val sources = retrieveSources(firstResult.adminArea)
+                            runOnUiThread {
+                                val adapter = sources?.let { SourcesAdapter(it) }
+                                recyclerView.adapter = adapter
+                                recyclerView.layoutManager = LinearLayoutManager(this@MapsActivity, LinearLayoutManager.HORIZONTAL, false)
+
+                            }
                         }
-
-                        // Display sources when a pin is dropped
-                        val sources = getFakeSources()
-                        val adapter = SourcesAdapter(sources)
-
-                        recyclerView.adapter = adapter
-                        recyclerView.layoutManager = LinearLayoutManager(this@MapsActivity, LinearLayoutManager.HORIZONTAL, false)
                         toast.show()
 
                         // Add a map marker where the user tapped and pan the camera over
@@ -188,7 +188,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     // This function must be called from a background thread since it will be doing some networking
-    fun retrieveSource(location: String): List<Source>?
+    fun retrieveSources(location: String): List<Source>?
     {
         // Building the request
         val request = Request.Builder()
@@ -196,6 +196,45 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 .build()
         // Actually makes the API call, blocking the thread until it completes
         val response = okHttpClient.newCall(request).execute()
-        return null
+
+        // Empty list of articles that we'll build up from the response
+        val sources = mutableListOf<Source>()
+
+        // Get the JSON string body, if there was one
+        val responseString = response.body?.string()
+
+        // Make sure the server responded successfully, and with some JSON data
+        if (response.isSuccessful && !responseString.isNullOrEmpty()) {
+            // Represents the JSON from the root level
+            val json = JSONObject(responseString)
+
+            // Grab the "articles" array from the root level
+            val articles = json.getJSONArray("articles")
+
+            // Loop over the articles
+            for (i in 0 until articles.length()) {
+                // Grab the current article
+                val curr = articles.getJSONObject(i)
+
+                // Get the title of the article
+                val title = curr.getString("title")
+
+                // Get the source
+                val source = curr.getJSONObject("source").getString("name")
+
+                // Get the description
+                val description = curr.getString("description")
+
+                // TODO: Get the thumbnail on check-in 3
+
+                sources.add(
+                    Source(
+                        username = title,
+                        content = description,
+                    )
+                )
+            }
+        }
+        return sources
     }
 }
