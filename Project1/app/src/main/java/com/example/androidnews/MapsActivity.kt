@@ -19,7 +19,8 @@ import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import org.jetbrains.anko.doAsync
-
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.StaggeredGridLayoutManager
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
@@ -36,11 +37,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         mapFragment.getMapAsync(this)
 
         recyclerView = findViewById(R.id.recyclerView)
-        val sources = getFakeSources()
+        /*val sources = getFakeSources()
         val adapter = SourcesAdapter(sources)
 
         recyclerView.adapter = adapter
-        recyclerView.layoutManager = LinearLayoutManager(this)
+        recyclerView.layoutManager = LinearLayoutManager(this)*/
     }
 
     /**
@@ -92,6 +93,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                             "You clicked: $postalAddress",
                             Toast.LENGTH_LONG
                         )
+                        val sources = getFakeSources()
+                        val adapter = SourcesAdapter(sources)
+
+                        recyclerView.adapter = adapter
+                        recyclerView.layoutManager = LinearLayoutManager(this@MapsActivity, LinearLayoutManager.HORIZONTAL, false)
                         toast.show()
 
                         // Add a map marker where the user tapped and pan the camera over
