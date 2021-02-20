@@ -142,7 +142,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             }
         }
     }
-    fun getFakeSources(): List<Source> {
+    /*fun getFakeSources(): List<Source> {
         return listOf(
             Source(
                 username = "iaculis nunc",
@@ -185,7 +185,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 content = "Dignissim sodales ut eu sem integer vitae justo.",
             )
         )
-    }
+    }*/
 
     // This function must be called from a background thread since it will be doing some networking
     fun retrieveSources(location: String): List<Source>?
@@ -231,6 +231,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                     Source(
                         username = title,
                         content = description,
+                        source = source,
                     )
                 )
             }

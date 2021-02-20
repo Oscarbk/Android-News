@@ -46,42 +46,52 @@ class SourceActivity : AppCompatActivity() {
             Source(
                 username = "iaculis nunc",
                 content = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Eu ultrices vitae auctor eu augue ut lectus. Sollicitudin tempor id eu nisl. Diam volutpat commodo sed egestas egestas fringilla.",
+                source = "placeholder"
             ),
             Source(
                 username = "aliquet porttitor",
                 content = "Odio ut enim blandit volutpat maecenas volutpat blandit.",
+                source = "placeholder"
             ),
             Source(
                 username = "tincidunt tortor",
                 content = "Luctus accumsan tortor posuere ac ut consequat semper viverra.",
+                source = "placeholder"
             ),
             Source(
                 username = "tellus elementum",
                 content = "Urna condimentum mattis pellentesque id nibh. Sollicitudin aliquam ultrices sagittis orci a scelerisque. Egestas integer eget aliquet nibh praesent tristique magna sit amet.",
+                source = "placeholder"
             ),
             Source(
                 username = "ante in",
                 content = "Cras adipiscing enim eu turpis egestas pretium.",
+                source = "placeholder"
             ),
             Source(
                 username = "sociis natoque",
                 content = "Purus semper eget duis at tellus at urna condimentum. Urna condimentum mattis pellentesque id nibh tortor id.",
+                source = "placeholder"
             ),
             Source(
                 username = "lorem ipsum",
                 content = "Adipiscing bibendum est ultricies integer quis auctor elit sed vulputate.",
+                source = "placeholder"
             ),
             Source(
                 username = "aliquam etiam",
                 content = "Elementum sagittis vitae et leo duis ut diam quam.",
+                source = "placeholder"
             ),
             Source(
                 username = "euismod nisi",
                 content = "Proin sagittis nisl rhoncus mattis rhoncus urna. Vitae tortor condimentum lacinia quis vel eros donec ac odio.",
+                source = "placeholder"
             ),
             Source(
                 username = "quisque id",
                 content = "Dignissim sodales ut eu sem integer vitae justo.",
+                source = "placeholder"
             )
         )
     }

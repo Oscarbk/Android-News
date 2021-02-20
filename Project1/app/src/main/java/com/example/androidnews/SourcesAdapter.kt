@@ -31,6 +31,7 @@ class SourcesAdapter(val sources: List<Source>) : RecyclerView.Adapter<SourcesAd
         val currentSource = sources[position]
         holder.username.text = currentSource.username
         holder.content.text = currentSource.content
+        holder.source.text = currentSource.source
     }
 
     override fun getItemCount(): Int {
@@ -41,5 +42,6 @@ class SourcesAdapter(val sources: List<Source>) : RecyclerView.Adapter<SourcesAd
     class ViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
         val username: TextView = itemView.findViewById(R.id.username)
         val content: TextView = itemView.findViewById(R.id.tweet_content)
+        val source: TextView = itemView.findViewById(R.id.source)
     }
 }
