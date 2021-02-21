@@ -165,11 +165,14 @@ class SourceActivity : AppCompatActivity() {
     }
     fun retrieveSources(category: String): List<Source>
     {
+
         val apiKey = getString(R.string.api_key)
         // Building the request
         val request = Request.Builder()
-                .url("https://newsapi.org/v2/sources?category=$category&language=en&apiKey=bdc116a1bab1437fbd328fe64fe80558")
+                .url("https://newsapi.org/v2/sources?category=$category&language=en&apiKey=$apiKey")
                 .build()
+
+        Log.d("key", "My url: https://newsapi.org/v2/sources?category=$category&language=en&apiKey=$apiKey")
         // Actually makes the API call, blocking the thread until it completes
         val response = okHttpClient.newCall(request).execute()
 

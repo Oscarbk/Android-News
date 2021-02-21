@@ -71,4 +71,16 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/topHeadlines" />
 
+    <Button
+        android:id="@+id/button2"
+        android:layout_width="400dp"
+        android:layout_height="400dp"
+        android:autoLink="web"
+        android:text="google.com"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/viewTopHeadlines" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -16,16 +16,6 @@
         tools:layout_editor_absoluteX="16dp"
         tools:layout_editor_absoluteY="-88dp" />
 
-    <!--<HorizontalScrollView
-        android:id="@+id/HScrollView"
-        android:layout_width="match_parent"
-        android:layout_height="200dp"
-        android:layout_marginBottom="20dp"
-        android:fillViewport="true"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">-->
-
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
         android:layout_width="wrap_content"
@@ -36,7 +26,5 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/sourceBox" />
-<!--
-    </HorizontalScrollView>
--->
+
 </androidx.constraintlayout.widget.ConstraintLayout>
