@@ -76,7 +76,7 @@ class SourceActivity : AppCompatActivity() {
             })
         //val sources = getFakeSources()
         doAsync {
-            val sources = retrieveSources(term)
+            val sources = retrieveSources("Business")
             runOnUiThread {
                 val adapter = SourcesAdapter(sources)
                 recyclerView.adapter = adapter
@@ -163,12 +163,12 @@ class SourceActivity : AppCompatActivity() {
                 )
         )
     }
-    fun retrieveSources(term: String): List<Source>
+    fun retrieveSources(category: String): List<Source>
     {
         val apiKey = getString(R.string.api_key)
         // Building the request
         val request = Request.Builder()
-                .url("https://newsapi.org/v2/everything?q=$term&sortBy=popularity&$apiKey")
+                .url("https://newsapi.org/v2/sources?category=$category&language=en&apiKey=bdc116a1bab1437fbd328fe64fe80558")
                 .build()
         // Actually makes the API call, blocking the thread until it completes
         val response = okHttpClient.newCall(request).execute()
@@ -185,18 +185,15 @@ class SourceActivity : AppCompatActivity() {
             val json = JSONObject(responseString)
 
             // Grab the "articles" array from the root level
-            val articles = json.getJSONArray("articles")
+            val articles = json.getJSONArray("sources")
 
-            // Loop over the articles
+            // Loop over the sources
             for (i in 0 until articles.length()) {
                 // Grab the current article
                 val curr = articles.getJSONObject(i)
 
                 // Get the title of the article
-                val title = curr.getString("title")
-
-                // Get the source
-                val source = curr.getJSONObject("source").getString("name")
+                val title = curr.getString("name")
 
                 // Get the description
                 val description = curr.getString("description")
@@ -209,7 +206,7 @@ class SourceActivity : AppCompatActivity() {
                         Source(
                                 username = title,
                                 content = description,
-                                source = source,
+                                source = "",
                                 url = url,
                         )
                 )
