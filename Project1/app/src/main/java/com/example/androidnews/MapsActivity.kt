@@ -1,5 +1,6 @@
 package com.example.androidnews
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -30,6 +31,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var mMap: GoogleMap
     private lateinit var recyclerView: RecyclerView
+    //private lateinit var article: cardView
 
     // OkHttp is a library used to make network calls
     private val okHttpClient: OkHttpClient
