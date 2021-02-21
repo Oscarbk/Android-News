@@ -1,6 +1,5 @@
 package com.example.androidnews
 
-import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -13,10 +12,7 @@ import com.google.android.gms.maps.model.MarkerOptions
 import android.location.Address
 import android.location.Geocoder
 import android.util.Log
-import android.widget.ArrayAdapter
-import android.widget.HorizontalScrollView
-import android.widget.Spinner
-import android.widget.Toast
+import android.widget.*
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import org.jetbrains.anko.doAsync
@@ -31,7 +27,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var mMap: GoogleMap
     private lateinit var recyclerView: RecyclerView
-    //private lateinit var article: cardView
 
     // OkHttp is a library used to make network calls
     private val okHttpClient: OkHttpClient
@@ -47,7 +42,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     }
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_maps)
@@ -59,7 +53,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         recyclerView = findViewById(R.id.recyclerView)
         /*val sources = getFakeSources()
         val adapter = SourcesAdapter(sources)
-
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(this)*/
     }
@@ -205,8 +198,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         val apiKey = getString(R.string.api_key)
         // Building the request
         val request = Request.Builder()
-                .url("https://newsapi.org/v2/everything?q=$location&sortBy=popularity&$apiKey")
-                .build()
+            .url("https://newsapi.org/v2/everything?q=$location&sortBy=popularity&$apiKey")
+            .build()
         // Actually makes the API call, blocking the thread until it completes
         val response = okHttpClient.newCall(request).execute()
 
@@ -238,6 +231,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 // Get the description
                 val description = curr.getString("description")
 
+                val url = curr.getString("url")
+
                 // TODO: Get the thumbnail on check-in 3
 
                 sources.add(
@@ -245,8 +240,10 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                         username = title,
                         content = description,
                         source = source,
+                        url = url,
                     )
                 )
+
             }
         }
         return sources
