@@ -32,7 +32,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var recyclerView: RecyclerView
 
     // OkHttp is a library used to make network calls
-  //  val okHttpClient: OkHttpClient = OkHttpClient.Builder().build()
     private val okHttpClient: OkHttpClient
     init {
         val builder = OkHttpClient.Builder()
@@ -116,12 +115,23 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
                         // Network call needs to be on another thread
                         doAsync {
-                            val sources = retrieveSources(firstResult.adminArea)
-                            runOnUiThread {
-                                val adapter = sources?.let { SourcesAdapter(it) }
-                                recyclerView.adapter = adapter
-                                recyclerView.layoutManager = LinearLayoutManager(this@MapsActivity, LinearLayoutManager.HORIZONTAL, false)
+                            try {
+                                val sources = retrieveSources(firstResult.adminArea)
+                                runOnUiThread {
+                                    val adapter = sources?.let { SourcesAdapter(it) }
+                                    recyclerView.adapter = adapter
+                                    recyclerView.layoutManager = LinearLayoutManager(
+                                        this@MapsActivity,
+                                        LinearLayoutManager.HORIZONTAL,
+                                        false
+                                    )
 
+                                }
+                            } catch (e: java.lang.Exception) {
+                                runOnUiThread {
+                                    // TODO: Display error message if can't connect to the internet
+
+                                }
                             }
                         }
                         toast.show()
@@ -190,9 +200,10 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     // This function must be called from a background thread since it will be doing some networking
     fun retrieveSources(location: String): List<Source>?
     {
+        val apiKey = getString(R.string.api_key)
         // Building the request
         val request = Request.Builder()
-                .url("https://newsapi.org/v2/everything?q=$location&sortBy=popularity&apiKey=bdc116a1bab1437fbd328fe64fe80558")
+                .url("https://newsapi.org/v2/everything?q=$location&sortBy=popularity&$apiKey")
                 .build()
         // Actually makes the API call, blocking the thread until it completes
         val response = okHttpClient.newCall(request).execute()
