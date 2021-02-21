@@ -1,28 +1,25 @@
 package com.example.androidnews
 
 import android.os.Bundle
+import android.util.Log
+import android.view.View
+import android.widget.*
+import android.widget.AdapterView.OnItemSelectedListener
 import android.widget.ArrayAdapter
-import android.widget.EditText
-import android.widget.Spinner
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import okhttp3.OkHttpClient
 import okhttp3.Request
+import okhttp3.logging.HttpLoggingInterceptor
+import org.jetbrains.anko.doAsync
 import org.json.JSONObject
 
-import android.location.Address
-import android.location.Geocoder
-import android.util.Log
-import android.widget.*
-import org.jetbrains.anko.doAsync
-import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.StaggeredGridLayoutManager
-import okhttp3.OkHttpClient
-import okhttp3.logging.HttpLoggingInterceptor
 
 class SourceActivity : AppCompatActivity() {
 
     private lateinit var recyclerView: RecyclerView
+    private lateinit var categories: Spinner
 
     // OkHttp is a library used to make network calls
     private val okHttpClient: OkHttpClient
@@ -46,9 +43,37 @@ class SourceActivity : AppCompatActivity() {
         val term: String = intent.getStringExtra("TERM")!!
         setTitle("Search for $term")
 
-
-
         recyclerView = findViewById(R.id.recyclerView)
+        categories = findViewById(R.id.spinner)
+
+
+
+
+        // TODO HERE: add parm to get articles function to select for categories
+        Log.d("spin", "test")
+            categories.setOnItemSelectedListener(object : OnItemSelectedListener {
+                override fun onItemSelected(parentView: AdapterView<*>?, selectedItemView: View?, position: Int, id: Long) {
+                    // your code here
+                    Log.d("spin", "1")
+                    val text: String = categories.getSelectedItem().toString()
+                    Log.d("spin", "$text")
+                    doAsync {
+                        val sources = retrieveSources(text)
+                        runOnUiThread {
+                            val adapter = SourcesAdapter(sources)
+                            recyclerView.adapter = adapter
+                            recyclerView.layoutManager = LinearLayoutManager(this@SourceActivity)
+                        }
+                    }
+                }
+
+                override fun onNothingSelected(parentView: AdapterView<*>?) {
+                    // your code here
+                    Log.d("spin", "2")
+
+                }
+
+            })
         //val sources = getFakeSources()
         doAsync {
             val sources = retrieveSources(term)
@@ -63,9 +88,9 @@ class SourceActivity : AppCompatActivity() {
         val spinner: Spinner = findViewById(R.id.spinner)
         // Create an ArrayAdapter using the string array and a default spinner layout
         ArrayAdapter.createFromResource(
-            this,
-            R.array.sources_array,
-            android.R.layout.simple_spinner_item
+                this,
+                R.array.sources_array,
+                android.R.layout.simple_spinner_item
         ).also { adapter ->
             // Specify the layout to use when the list of choices appears
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
@@ -75,67 +100,67 @@ class SourceActivity : AppCompatActivity() {
     }
     fun getFakeSources(): List<Source> {
         return listOf(
-            Source(
-                username = "iaculis nunc",
-                content = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Eu ultrices vitae auctor eu augue ut lectus. Sollicitudin tempor id eu nisl. Diam volutpat commodo sed egestas egestas fringilla.",
-                source = "placeholder",
-                    url = "google",
+                Source(
+                        username = "iaculis nunc",
+                        content = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Eu ultrices vitae auctor eu augue ut lectus. Sollicitudin tempor id eu nisl. Diam volutpat commodo sed egestas egestas fringilla.",
+                        source = "placeholder",
+                        url = "google",
 
-            ),
-            Source(
-                username = "aliquet porttitor",
-                content = "Odio ut enim blandit volutpat maecenas volutpat blandit.",
-                source = "placeholder",
-                    url = "google",
-            ),
-            Source(
-                username = "tincidunt tortor",
-                content = "Luctus accumsan tortor posuere ac ut consequat semper viverra.",
-                source = "placeholder",
-                    url = "google",
-            ),
-            Source(
-                username = "tellus elementum",
-                content = "Urna condimentum mattis pellentesque id nibh. Sollicitudin aliquam ultrices sagittis orci a scelerisque. Egestas integer eget aliquet nibh praesent tristique magna sit amet.",
-                source = "placeholder",
-                    url = "google",
-            ),
-            Source(
-                username = "ante in",
-                content = "Cras adipiscing enim eu turpis egestas pretium.",
-                source = "placeholder",
-                    url = "google",
-            ),
-            Source(
-                username = "sociis natoque",
-                content = "Purus semper eget duis at tellus at urna condimentum. Urna condimentum mattis pellentesque id nibh tortor id.",
-                source = "placeholder",
-                    url = "google",
-            ),
-            Source(
-                username = "lorem ipsum",
-                content = "Adipiscing bibendum est ultricies integer quis auctor elit sed vulputate.",
-                source = "placeholder",
-                    url = "google",
-            ),
-            Source(
-                username = "aliquam etiam",
-                content = "Elementum sagittis vitae et leo duis ut diam quam.",
-                source = "placeholder",
-                    url = "google",
-            ),
-            Source(
-                username = "euismod nisi",
-                content = "Proin sagittis nisl rhoncus mattis rhoncus urna. Vitae tortor condimentum lacinia quis vel eros donec ac odio.",
-                source = "placeholder",
-                    url = "google",
-            ),
-            Source(
-                username = "quisque id",
-                content = "Dignissim sodales ut eu sem integer vitae justo.",
-                source = "placeholder",
-                url = "google",
-            )
+                        ),
+                Source(
+                        username = "aliquet porttitor",
+                        content = "Odio ut enim blandit volutpat maecenas volutpat blandit.",
+                        source = "placeholder",
+                        url = "google",
+                ),
+                Source(
+                        username = "tincidunt tortor",
+                        content = "Luctus accumsan tortor posuere ac ut consequat semper viverra.",
+                        source = "placeholder",
+                        url = "google",
+                ),
+                Source(
+                        username = "tellus elementum",
+                        content = "Urna condimentum mattis pellentesque id nibh. Sollicitudin aliquam ultrices sagittis orci a scelerisque. Egestas integer eget aliquet nibh praesent tristique magna sit amet.",
+                        source = "placeholder",
+                        url = "google",
+                ),
+                Source(
+                        username = "ante in",
+                        content = "Cras adipiscing enim eu turpis egestas pretium.",
+                        source = "placeholder",
+                        url = "google",
+                ),
+                Source(
+                        username = "sociis natoque",
+                        content = "Purus semper eget duis at tellus at urna condimentum. Urna condimentum mattis pellentesque id nibh tortor id.",
+                        source = "placeholder",
+                        url = "google",
+                ),
+                Source(
+                        username = "lorem ipsum",
+                        content = "Adipiscing bibendum est ultricies integer quis auctor elit sed vulputate.",
+                        source = "placeholder",
+                        url = "google",
+                ),
+                Source(
+                        username = "aliquam etiam",
+                        content = "Elementum sagittis vitae et leo duis ut diam quam.",
+                        source = "placeholder",
+                        url = "google",
+                ),
+                Source(
+                        username = "euismod nisi",
+                        content = "Proin sagittis nisl rhoncus mattis rhoncus urna. Vitae tortor condimentum lacinia quis vel eros donec ac odio.",
+                        source = "placeholder",
+                        url = "google",
+                ),
+                Source(
+                        username = "quisque id",
+                        content = "Dignissim sodales ut eu sem integer vitae justo.",
+                        source = "placeholder",
+                        url = "google",
+                )
         )
     }
     fun retrieveSources(term: String): List<Source>
