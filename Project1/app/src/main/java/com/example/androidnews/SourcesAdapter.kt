@@ -38,6 +38,8 @@ class SourcesAdapter(val sources: List<Source>) : RecyclerView.Adapter<SourcesAd
         holder.content.text = currentSource.content
         holder.source.text = currentSource.source
 
+        holder.url.text = currentSource.url
+
         val test = currentSource.url
         holder.url.setOnClickListener{
             Log.d("BUTTON", "Button was clicked: $test")
@@ -53,8 +55,8 @@ class SourcesAdapter(val sources: List<Source>) : RecyclerView.Adapter<SourcesAd
         val username: TextView = itemView.findViewById(R.id.username)
         val content: TextView = itemView.findViewById(R.id.tweet_content)
         val source: TextView = itemView.findViewById(R.id.source)
-        //val url: TextView = itemView.findViewById(R.id.url)
-        val url: Button = itemView.findViewById(R.id.url)
+        val url: TextView = itemView.findViewById(R.id.url)
+        //val url: Button = itemView.findViewById(R.id.url)
     }
 
 }
