@@ -13,3 +13,11 @@
 .externalNativeBuild
 .cxx
 local.properties
+
+
+# Committing api keys so project works once pulling
+# Will change api keys later once made public
+#/app/src/debug/res/values/google_maps_api.xml
+#/app/src/release/res/values/google_maps_api.xml
+#/app/src/main/res/values/api_keys.xml
+#/app/src/debug/res/values/news_api.xml

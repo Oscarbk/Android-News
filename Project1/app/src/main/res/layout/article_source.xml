@@ -38,30 +38,8 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="@id/username"
-                app:layout_constraintTop_toBottomOf="@+id/source"
-                app:layout_constraintVertical_bias="0.0"
-                tools:text="Android is a mobile operating system developed by Google, based on a modified version of the Linux kernel and other open source software and designed primarily for touchscreen mobile devices such as smartphones and tablets." />
-
-            <TextView
-                android:id="@+id/source"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                android:textStyle="bold"
-                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/username"
-                tools:text="source" />
-
-            <Button
-                android:id="@+id/url"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:text="View Article"
-                android:visibility="gone"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/tweet_content" />
+                tools:text="Android is a mobile operating system developed by Google, based on a modified version of the Linux kernel and other open source software and designed primarily for touchscreen mobile devices such as smartphones and tablets." />
 
 
         </androidx.constraintlayout.widget.ConstraintLayout>
