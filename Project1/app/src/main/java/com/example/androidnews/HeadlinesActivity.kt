@@ -1,5 +1,7 @@
 package com.example.androidnews
 
+import android.annotation.SuppressLint
+import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -14,12 +16,19 @@ import okhttp3.Request
 import okhttp3.logging.HttpLoggingInterceptor
 import org.jetbrains.anko.doAsync
 import org.json.JSONObject
+import org.w3c.dom.Text
 
 
 class HeadlinesActivity : AppCompatActivity() {
 
+    private var currentPage = 1
+    private var maxPages = 0
+
     private lateinit var recyclerView: RecyclerView
     private lateinit var categories: Spinner
+    private lateinit var prev: TextView
+    private lateinit var next: TextView
+    private lateinit var pageSomething: TextView
 
     // OkHttp is a library used to make network calls
     private val okHttpClient: OkHttpClient
@@ -35,6 +44,7 @@ class HeadlinesActivity : AppCompatActivity() {
 
     }
 
+    @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_headlines)
@@ -45,43 +55,58 @@ class HeadlinesActivity : AppCompatActivity() {
 
         recyclerView = findViewById(R.id.recyclerView)
         categories = findViewById(R.id.spinner)
-
-
-
+        next = findViewById(R.id.next)
+        prev = findViewById(R.id.prev)
+        pageSomething = findViewById(R.id.currentPage)
 
         // TODO HERE: add parm to get articles function to select for categories
         Log.d("spin", "test")
-            categories.setOnItemSelectedListener(object : OnItemSelectedListener {
-                override fun onItemSelected(parentView: AdapterView<*>?, selectedItemView: View?, position: Int, id: Long) {
-                    // your code here
-                    Log.d("spin", "1")
-                    val text: String = categories.getSelectedItem().toString()
-                    Log.d("spin", "$text")
-                    doAsync {
-                        val sources = retrieveSources(text)
-                        runOnUiThread {
-                            val adapter = SourcesAdapter(sources)
-                            recyclerView.adapter = adapter
-                            recyclerView.layoutManager = LinearLayoutManager(this@HeadlinesActivity)
-                        }
-                    }
-                }
-
-                override fun onNothingSelected(parentView: AdapterView<*>?) {
-                    // your code here
-                    Log.d("spin", "2")
-
-                }
-
-            })
-        //val sources = getFakeSources()
-        doAsync {
-            val sources = retrieveSources("Business")
-            runOnUiThread {
-                val adapter = SourcesAdapter(sources)
-                recyclerView.adapter = adapter
-                recyclerView.layoutManager = LinearLayoutManager(this@HeadlinesActivity)
+        categories.setOnItemSelectedListener(object : OnItemSelectedListener {
+            override fun onItemSelected(parentView: AdapterView<*>?, selectedItemView: View?, position: Int, id: Long) {
+                // your code here
+                currentPage = 1
+                val text: String = categories.getSelectedItem().toString()
+                Log.d("spin", text)
+                displayPage(text, currentPage)
             }
+
+            override fun onNothingSelected(parentView: AdapterView<*>?) {
+                // your code here
+                Log.d("spin", "2")
+            }
+
+        })
+        displayPage("Business", currentPage)
+        next.setTextColor(Color.BLUE)
+        next.setOnClickListener {
+            if (currentPage < maxPages) {
+                currentPage++
+                displayPage(categories.getSelectedItem().toString(), currentPage)
+                if (currentPage == maxPages)
+                    next.setTextColor(Color.GRAY)
+                prev.setTextColor(Color.BLUE)
+            }
+            else
+            {
+                return@setOnClickListener
+            }
+            Log.d("page", "current page is $currentPage")
+        }
+        prev.setOnClickListener {
+            if (currentPage > 1) {
+                currentPage--
+                displayPage(categories.getSelectedItem().toString(), currentPage)
+                if (currentPage == 1)
+                    // TODO: set to the default color
+                    prev.setTextColor(Color.GRAY)
+                next.setTextColor(Color.BLUE)
+            }
+
+            else
+            {
+                return@setOnClickListener
+            }
+            Log.d("page", "current page is $currentPage")
         }
 
         // The following code snippet is adapted from the android developer documentation on Spinners
@@ -96,6 +121,19 @@ class HeadlinesActivity : AppCompatActivity() {
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
             // Apply the adapter to the spinner
             spinner.adapter = adapter
+        }
+    }
+    fun displayPage(category: String, page: Int)
+    {
+        doAsync {
+            val sources = retrieveSources(category, page)
+            runOnUiThread {
+                val adapter = SourcesAdapter(sources)
+                recyclerView.adapter = adapter
+                recyclerView.layoutManager = LinearLayoutManager(this@HeadlinesActivity)
+                val update = "$currentPage / $maxPages"
+                pageSomething.text = update
+            }
         }
     }
     fun getFakeSources(): List<Source> {
@@ -163,14 +201,14 @@ class HeadlinesActivity : AppCompatActivity() {
                 )
         )
     }
-    fun retrieveSources(category: String): List<Source>
+    fun retrieveSources(category: String, page: Int): List<Source>
     {
 
         val apiKey = getString(R.string.api_key)
 
         // Building the request
         val request = Request.Builder()
-                .url("https://newsapi.org/v2/top-headlines?country=US&category=$category&apiKey=$apiKey")
+                .url("https://newsapi.org/v2/top-headlines?country=US&category=$category&page=$page&apiKey=$apiKey")
                 .build()
 
         Log.d("headlines", "My url: https://newsapi.org/v2/top-headlines?country=US&category=$category&apiKey=$apiKey")
@@ -191,6 +229,8 @@ class HeadlinesActivity : AppCompatActivity() {
             // Grab the "articles" array from the root level
             val articles = json.getJSONArray("articles")
 
+            maxPages = json.getString("totalResults").toInt() / 20 + 1
+
             // Loop over the sources
             for (i in 0 until articles.length()) {
                 // Grab the current article
@@ -205,7 +245,6 @@ class HeadlinesActivity : AppCompatActivity() {
                 val url = curr.getString("url")
 
                 // TODO: Get the thumbnail on check-in 3
-
                 sources.add(
                         Source(
                                 username = title,
@@ -214,7 +253,6 @@ class HeadlinesActivity : AppCompatActivity() {
                                 url = url,
                         )
                 )
-
             }
         }
         return sources
