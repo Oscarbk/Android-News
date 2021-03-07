@@ -48,12 +48,17 @@ class SourcesAdapter(val sources: List<Source>) : RecyclerView.Adapter<SourcesAd
             // TODO: come back to this
 
             val url = test
-            val intent = Intent(Intent.ACTION_VIEW)
-            intent.data = Uri.parse(url)
-            holder.url.getContext().startActivity(intent)
 
-            /*val intent = Intent(holder.url.getContext(), MainActivity:: class.java)
-            holder.url.getContext().startActivity(intent)*/
+            if (url != "goToResults") {
+                val intent = Intent(Intent.ACTION_VIEW)
+                intent.data = Uri.parse(url)
+                holder.url.getContext().startActivity(intent)
+            }
+            else {
+                val intent = Intent(holder.url.getContext(), ResultsActivity::class.java)
+                intent.putExtra("SOURCE", holder.source.text)
+                holder.url.getContext().startActivity(intent)
+            }
         }
     }
     override fun getItemCount(): Int {

@@ -42,6 +42,7 @@
         </activity>
         <activity android:name=".SourceActivity" />
         <activity android:name=".HeadlinesActivity"/>
+        <activity android:name=".ResultsActivity"/>
     </application>
 
 </manifest>

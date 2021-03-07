@@ -16,7 +16,7 @@ import org.jetbrains.anko.doAsync
 import org.json.JSONObject
 
 
-class SourceActivity : AppCompatActivity() {
+class ResultsActivity : AppCompatActivity() {
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var categories: Spinner
@@ -40,7 +40,7 @@ class SourceActivity : AppCompatActivity() {
         setContentView(R.layout.activity_source)
 
         val intent = getIntent()
-        val term: String = intent.getStringExtra("TERM")!!
+        val term: String = intent.getStringExtra("SOURCE")!!
         setTitle("Search for $term")
 
         recyclerView = findViewById(R.id.recyclerView)
@@ -62,7 +62,7 @@ class SourceActivity : AppCompatActivity() {
                         runOnUiThread {
                             val adapter = SourcesAdapter(sources)
                             recyclerView.adapter = adapter
-                            recyclerView.layoutManager = LinearLayoutManager(this@SourceActivity)
+                            recyclerView.layoutManager = LinearLayoutManager(this@ResultsActivity)
                         }
                     }
                 }
@@ -80,7 +80,7 @@ class SourceActivity : AppCompatActivity() {
             runOnUiThread {
                 val adapter = SourcesAdapter(sources)
                 recyclerView.adapter = adapter
-                recyclerView.layoutManager = LinearLayoutManager(this@SourceActivity)
+                recyclerView.layoutManager = LinearLayoutManager(this@ResultsActivity)
             }
         }
 
@@ -165,7 +165,7 @@ class SourceActivity : AppCompatActivity() {
     }
     fun retrieveSources(category: String): List<Source>
     {
-        val text: String = categories.getSelectedItem().toString()
+
         val apiKey = getString(R.string.api_key)
 
         // Building the request
@@ -210,8 +210,8 @@ class SourceActivity : AppCompatActivity() {
                         Source(
                                 username = title,
                                 content = description,
-                                source = text,
-                                url = "goToResults",
+                                source = "",
+                                url = url,
                         )
                 )
             }

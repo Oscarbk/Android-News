@@ -97,7 +97,7 @@ class HeadlinesActivity : AppCompatActivity() {
                 currentPage--
                 displayPage(categories.getSelectedItem().toString(), currentPage)
                 if (currentPage == 1)
-                    // TODO: set to the default color
+                    // TODO: This can be done better
                     prev.setTextColor(Color.GRAY)
                 next.setTextColor(Color.BLUE)
             }
