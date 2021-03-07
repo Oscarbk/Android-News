@@ -170,10 +170,10 @@ class HeadlinesActivity : AppCompatActivity() {
 
         // Building the request
         val request = Request.Builder()
-                .url("https://newsapi.org/v2/sources?category=$category&language=en&apiKey=$apiKey")
+                .url("https://newsapi.org/v2/top-headlines?country=US&category=$category&apiKey=$apiKey")
                 .build()
 
-        Log.d("key", "My url: https://newsapi.org/v2/sources?category=$category&language=en&apiKey=$apiKey")
+        Log.d("headlines", "My url: https://newsapi.org/v2/top-headlines?country=US&category=$category&apiKey=$apiKey")
         // Actually makes the API call, blocking the thread until it completes
         val response = okHttpClient.newCall(request).execute()
 
@@ -189,7 +189,7 @@ class HeadlinesActivity : AppCompatActivity() {
             val json = JSONObject(responseString)
 
             // Grab the "articles" array from the root level
-            val articles = json.getJSONArray("sources")
+            val articles = json.getJSONArray("articles")
 
             // Loop over the sources
             for (i in 0 until articles.length()) {
@@ -197,7 +197,7 @@ class HeadlinesActivity : AppCompatActivity() {
                 val curr = articles.getJSONObject(i)
 
                 // Get the title of the article
-                val title = curr.getString("name")
+                val title = curr.getString("title")
 
                 // Get the description
                 val description = curr.getString("description")
