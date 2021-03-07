@@ -41,6 +41,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".SourceActivity" />
+        <activity android:name=".HeadlinesActivity"/>
     </application>
 
 </manifest>

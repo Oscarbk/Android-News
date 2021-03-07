@@ -14,6 +14,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var search: Button
     private lateinit var searchBar: EditText
     private lateinit var maps:  Button
+    private lateinit var headlines: Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -24,6 +25,7 @@ class MainActivity : AppCompatActivity() {
         searchBar = findViewById(R.id.searchBar)
         maps = findViewById(R.id.viewMap)
         search.setEnabled(false)
+        headlines = findViewById(R.id.viewTopHeadlines)
 
         // Go to sources activity
         search.setOnClickListener {
@@ -36,6 +38,12 @@ class MainActivity : AppCompatActivity() {
         // Go to maps activity
         maps.setOnClickListener {
             val intent = Intent(this, MapsActivity:: class.java)
+            startActivity(intent)
+        }
+
+        // Go to top headlines activity
+        headlines.setOnClickListener {
+            val intent = Intent(this, HeadlinesActivity::class.java)
             startActivity(intent)
         }
     }

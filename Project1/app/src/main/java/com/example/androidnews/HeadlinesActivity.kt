@@ -16,7 +16,7 @@ import org.jetbrains.anko.doAsync
 import org.json.JSONObject
 
 
-class SourceActivity : AppCompatActivity() {
+class HeadlinesActivity : AppCompatActivity() {
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var categories: Spinner
@@ -37,11 +37,11 @@ class SourceActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_source)
+        setContentView(R.layout.activity_headlines)
 
         val intent = getIntent()
-        val term: String = intent.getStringExtra("TERM")!!
-        setTitle("Search for $term")
+        //val term: String = intent.getStringExtra("TERM")!!
+        setTitle("Top Headlines")
 
         recyclerView = findViewById(R.id.recyclerView)
         categories = findViewById(R.id.spinner)
@@ -62,7 +62,7 @@ class SourceActivity : AppCompatActivity() {
                         runOnUiThread {
                             val adapter = SourcesAdapter(sources)
                             recyclerView.adapter = adapter
-                            recyclerView.layoutManager = LinearLayoutManager(this@SourceActivity)
+                            recyclerView.layoutManager = LinearLayoutManager(this@HeadlinesActivity)
                         }
                     }
                 }
@@ -80,7 +80,7 @@ class SourceActivity : AppCompatActivity() {
             runOnUiThread {
                 val adapter = SourcesAdapter(sources)
                 recyclerView.adapter = adapter
-                recyclerView.layoutManager = LinearLayoutManager(this@SourceActivity)
+                recyclerView.layoutManager = LinearLayoutManager(this@HeadlinesActivity)
             }
         }
 
