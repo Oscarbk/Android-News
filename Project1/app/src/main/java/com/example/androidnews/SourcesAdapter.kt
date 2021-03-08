@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat.startActivity
@@ -57,6 +58,7 @@ class SourcesAdapter(val sources: List<Source>) : RecyclerView.Adapter<SourcesAd
             else {
                 val intent = Intent(holder.url.getContext(), ResultsActivity::class.java)
                 intent.putExtra("SOURCE", holder.source.text)
+                intent.putExtra("TERM", currentSource.term)
                 holder.url.getContext().startActivity(intent)
             }
         }
@@ -73,6 +75,7 @@ class SourcesAdapter(val sources: List<Source>) : RecyclerView.Adapter<SourcesAd
         val url: TextView = itemView.findViewById(R.id.url)
         //val url: Button = itemView.findViewById(R.id.url)
         val click: ConstraintLayout = itemView.findViewById(R.id.card_view_layout)
+        val picture: ImageView = itemView.findViewById(R.id.image)
     }
 
 }

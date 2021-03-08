@@ -17,6 +17,7 @@ import okhttp3.logging.HttpLoggingInterceptor
 import org.jetbrains.anko.doAsync
 import org.json.JSONObject
 import org.w3c.dom.Text
+import kotlin.math.max
 
 
 class HeadlinesActivity : AppCompatActivity() {
@@ -68,6 +69,11 @@ class HeadlinesActivity : AppCompatActivity() {
                 val text: String = categories.getSelectedItem().toString()
                 Log.d("spin", text)
                 displayPage(text, currentPage)
+                // TODO: Fix colors
+                if (currentPage == maxPages) {
+                    next.setTextColor(Color.GRAY)
+                }
+                prev.setTextColor(Color.GRAY)
             }
 
             override fun onNothingSelected(parentView: AdapterView<*>?) {
@@ -136,7 +142,7 @@ class HeadlinesActivity : AppCompatActivity() {
             }
         }
     }
-    fun getFakeSources(): List<Source> {
+    /*fun getFakeSources(): List<Source> {
         return listOf(
                 Source(
                         username = "iaculis nunc",
@@ -200,7 +206,7 @@ class HeadlinesActivity : AppCompatActivity() {
                         url = "google",
                 )
         )
-    }
+    }*/
     fun retrieveSources(category: String, page: Int): List<Source>
     {
 
@@ -251,6 +257,8 @@ class HeadlinesActivity : AppCompatActivity() {
                                 content = description,
                                 source = "",
                                 url = url,
+                                term = "",
+                                iconUrl = ""
                         )
                 )
             }

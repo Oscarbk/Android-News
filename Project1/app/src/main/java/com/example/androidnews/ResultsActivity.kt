@@ -14,12 +14,15 @@ import okhttp3.Request
 import okhttp3.logging.HttpLoggingInterceptor
 import org.jetbrains.anko.doAsync
 import org.json.JSONObject
+import org.w3c.dom.Text
 
 
 class ResultsActivity : AppCompatActivity() {
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var categories: Spinner
+    private lateinit var categoryLabel: TextView
+    private lateinit var sourceLabel: TextView
 
     // OkHttp is a library used to make network calls
     private val okHttpClient: OkHttpClient
@@ -32,7 +35,6 @@ class ResultsActivity : AppCompatActivity() {
         builder.addInterceptor(logging)
 
         okHttpClient = builder.build()
-
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -40,65 +42,29 @@ class ResultsActivity : AppCompatActivity() {
         setContentView(R.layout.activity_source)
 
         val intent = getIntent()
-        val term: String = intent.getStringExtra("SOURCE")!!
-        setTitle("Search for $term")
+        val source: String = intent.getStringExtra("SOURCE")!!
+        val term: String = intent.getStringExtra("TERM")!!
+        setTitle("$source results for $term")
 
         recyclerView = findViewById(R.id.recyclerView)
         categories = findViewById(R.id.spinner)
+        categoryLabel = findViewById(R.id.category)
+        sourceLabel = findViewById(R.id.sourceBox)
 
+        categories.visibility = View.GONE
+        categoryLabel.visibility = View.GONE
+        sourceLabel.visibility = View.GONE
 
-
-
-        // TODO HERE: add parm to get articles function to select for categories
-        Log.d("spin", "test")
-            categories.setOnItemSelectedListener(object : OnItemSelectedListener {
-                override fun onItemSelected(parentView: AdapterView<*>?, selectedItemView: View?, position: Int, id: Long) {
-                    // your code here
-                    Log.d("spin", "1")
-                    val text: String = categories.getSelectedItem().toString()
-                    Log.d("spin", "$text")
-                    doAsync {
-                        val sources = retrieveSources(text)
-                        runOnUiThread {
-                            val adapter = SourcesAdapter(sources)
-                            recyclerView.adapter = adapter
-                            recyclerView.layoutManager = LinearLayoutManager(this@ResultsActivity)
-                        }
-                    }
-                }
-
-                override fun onNothingSelected(parentView: AdapterView<*>?) {
-                    // your code here
-                    Log.d("spin", "2")
-
-                }
-
-            })
-        //val sources = getFakeSources()
         doAsync {
-            val sources = retrieveSources("Business")
+            val sources = retrieveSources(source, term)
             runOnUiThread {
                 val adapter = SourcesAdapter(sources)
                 recyclerView.adapter = adapter
                 recyclerView.layoutManager = LinearLayoutManager(this@ResultsActivity)
             }
         }
-
-        // The following code snippet is adapted from the android developer documentation on Spinners
-        val spinner: Spinner = findViewById(R.id.spinner)
-        // Create an ArrayAdapter using the string array and a default spinner layout
-        ArrayAdapter.createFromResource(
-                this,
-                R.array.sources_array,
-                android.R.layout.simple_spinner_item
-        ).also { adapter ->
-            // Specify the layout to use when the list of choices appears
-            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-            // Apply the adapter to the spinner
-            spinner.adapter = adapter
-        }
     }
-    fun getFakeSources(): List<Source> {
+    /*fun getFakeSources(): List<Source> {
         return listOf(
                 Source(
                         username = "iaculis nunc",
@@ -162,18 +128,18 @@ class ResultsActivity : AppCompatActivity() {
                         url = "google",
                 )
         )
-    }
-    fun retrieveSources(category: String): List<Source>
+    }*/
+    fun retrieveSources(category: String, term: String): List<Source>
     {
 
         val apiKey = getString(R.string.api_key)
 
         // Building the request
         val request = Request.Builder()
-                .url("https://newsapi.org/v2/sources?category=$category&language=en&apiKey=$apiKey")
+                .url("https://newsapi.org/v2/everything?q=$term&source=$category&apiKey=$apiKey")
                 .build()
 
-        Log.d("key", "My url: https://newsapi.org/v2/sources?category=$category&language=en&apiKey=$apiKey")
+        Log.d("key", "My url: https://newsapi.org/v2/everything?q=$term&source=$category&apiKey=$apiKey")
         // Actually makes the API call, blocking the thread until it completes
         val response = okHttpClient.newCall(request).execute()
 
@@ -189,15 +155,18 @@ class ResultsActivity : AppCompatActivity() {
             val json = JSONObject(responseString)
 
             // Grab the "articles" array from the root level
-            val articles = json.getJSONArray("sources")
+            val articles = json.getJSONArray("articles")
 
             // Loop over the sources
             for (i in 0 until articles.length()) {
                 // Grab the current article
                 val curr = articles.getJSONObject(i)
 
+                val source = curr.getJSONObject("source").getString("name")
+
+
                 // Get the title of the article
-                val title = curr.getString("name")
+                val title = curr.getString("title")
 
                 // Get the description
                 val description = curr.getString("description")
@@ -210,8 +179,10 @@ class ResultsActivity : AppCompatActivity() {
                         Source(
                                 username = title,
                                 content = description,
-                                source = "",
+                                source = source,
                                 url = url,
+                                term = intent.getStringExtra("TERM")!!,
+                                iconUrl = ""
                         )
                 )
             }

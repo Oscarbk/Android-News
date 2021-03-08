@@ -240,6 +240,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                         content = description,
                         source = source,
                         url = url,
+                        term = "",
+                        iconUrl = ""
                     )
                 )
 

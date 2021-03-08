@@ -1,5 +1,6 @@
 package com.example.androidnews
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -20,6 +21,7 @@ class SourceActivity : AppCompatActivity() {
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var categories: Spinner
+    private lateinit var skip: Button
 
     // OkHttp is a library used to make network calls
     private val okHttpClient: OkHttpClient
@@ -45,9 +47,14 @@ class SourceActivity : AppCompatActivity() {
 
         recyclerView = findViewById(R.id.recyclerView)
         categories = findViewById(R.id.spinner)
+        skip = findViewById(R.id.skip)
 
-
-
+        skip.setOnClickListener {
+            val intent = Intent(this, ResultsActivity::class.java)
+            intent.putExtra("SOURCE", "All")
+            intent.putExtra("TERM", term)
+            startActivity(intent)
+        }
 
         // TODO HERE: add parm to get articles function to select for categories
         Log.d("spin", "test")
@@ -98,7 +105,7 @@ class SourceActivity : AppCompatActivity() {
             spinner.adapter = adapter
         }
     }
-    fun getFakeSources(): List<Source> {
+    /*fun getFakeSources(): List<Source> {
         return listOf(
                 Source(
                         username = "iaculis nunc",
@@ -162,7 +169,7 @@ class SourceActivity : AppCompatActivity() {
                         url = "google",
                 )
         )
-    }
+    }*/
     fun retrieveSources(category: String): List<Source>
     {
         val text: String = categories.getSelectedItem().toString()
@@ -210,8 +217,10 @@ class SourceActivity : AppCompatActivity() {
                         Source(
                                 username = title,
                                 content = description,
-                                source = text,
+                                source = title,
                                 url = "goToResults",
+                                term = intent.getStringExtra("TERM")!!,
+                                iconUrl = ""
                         )
                 )
             }

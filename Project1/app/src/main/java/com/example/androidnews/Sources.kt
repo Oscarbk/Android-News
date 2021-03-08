@@ -7,4 +7,6 @@ data class Source(
     val content: String,
     val source: String,
     val url: String,
+    val term: String,
+    val iconUrl: String,
 )
