@@ -49,6 +49,9 @@ class SourceActivity : AppCompatActivity() {
         categories = findViewById(R.id.spinner)
         skip = findViewById(R.id.skip)
 
+        //TODO: set image to gone
+        //TODO: set source to gone since it's in the title
+
         skip.setOnClickListener {
             val intent = Intent(this, ResultsActivity::class.java)
             intent.putExtra("SOURCE", "All")

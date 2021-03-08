@@ -13,6 +13,7 @@ import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat.startActivity
 import androidx.recyclerview.widget.RecyclerView
+import com.squareup.picasso.Picasso
 import org.jetbrains.anko.internals.AnkoInternals.getContext
 
 
@@ -42,14 +43,21 @@ class SourcesAdapter(val sources: List<Source>) : RecyclerView.Adapter<SourcesAd
         holder.source.text = currentSource.source
 
         //holder.url.text = currentSource.url
+        if (!currentSource.iconUrl.isNullOrBlank())
+        {
+            Picasso.get()
+                .load(currentSource.iconUrl)
+                .into(holder.icon)
+        }
 
         val test = currentSource.url
         holder.click.setOnClickListener(){//holder.url.setOnClickListener{
-            Log.d("BUTTON", "Button was clicked: $test")
+            Log.d("BUTTON", "Was URL passed: ${currentSource.iconUrl}")
             // TODO: come back to this
 
-            val url = test
 
+
+            val url = test
             if (url != "goToResults") {
                 val intent = Intent(Intent.ACTION_VIEW)
                 intent.data = Uri.parse(url)
@@ -75,7 +83,7 @@ class SourcesAdapter(val sources: List<Source>) : RecyclerView.Adapter<SourcesAd
         val url: TextView = itemView.findViewById(R.id.url)
         //val url: Button = itemView.findViewById(R.id.url)
         val click: ConstraintLayout = itemView.findViewById(R.id.card_view_layout)
-        val picture: ImageView = itemView.findViewById(R.id.image)
+        val icon: ImageView = itemView.findViewById(R.id.image)
     }
 
 }

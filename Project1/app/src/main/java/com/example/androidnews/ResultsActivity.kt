@@ -174,7 +174,7 @@ class ResultsActivity : AppCompatActivity() {
                 val url = curr.getString("url")
 
                 // TODO: Get the thumbnail on check-in 3
-
+                val urlImage = curr.getString("urlToImage")
                 sources.add(
                         Source(
                                 username = title,
@@ -182,7 +182,7 @@ class ResultsActivity : AppCompatActivity() {
                                 source = source,
                                 url = url,
                                 term = intent.getStringExtra("TERM")!!,
-                                iconUrl = ""
+                                iconUrl = urlImage
                         )
                 )
             }

@@ -233,6 +233,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 val url = curr.getString("url")
 
                 // TODO: Get the thumbnail on check-in 3
+                val urlImage = curr.getString("urlToImage")
 
                 sources.add(
                     Source(
@@ -241,10 +242,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                         source = source,
                         url = url,
                         term = "",
-                        iconUrl = ""
+                        iconUrl = urlImage
                     )
                 )
-
             }
         }
         return sources
