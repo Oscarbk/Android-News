@@ -44,6 +44,7 @@ class ResultsActivity : AppCompatActivity() {
         val intent = getIntent()
         val source: String = intent.getStringExtra("SOURCE")!!
         val term: String = intent.getStringExtra("TERM")!!
+        val sourceID: String = intent.getStringExtra("SOURCEID")!!
         setTitle("$source results for $term")
 
         recyclerView = findViewById(R.id.recyclerView)
@@ -56,7 +57,7 @@ class ResultsActivity : AppCompatActivity() {
         sourceLabel.visibility = View.GONE
 
         doAsync {
-            val sources = retrieveSources(source, term)
+            val sources = retrieveSources(sourceID, term)
             runOnUiThread {
                 val adapter = SourcesAdapter(sources)
                 recyclerView.adapter = adapter
@@ -136,10 +137,10 @@ class ResultsActivity : AppCompatActivity() {
 
         // Building the request
         val request = Request.Builder()
-                .url("https://newsapi.org/v2/everything?q=$term&source=$category&apiKey=$apiKey")
+                .url("https://newsapi.org/v2/everything?q=$term&sources=$category&apiKey=$apiKey")
                 .build()
 
-        Log.d("key", "My url: https://newsapi.org/v2/everything?q=$term&source=$category&apiKey=$apiKey")
+        Log.d("key", "My url: https://newsapi.org/v2/everything?q=$term&sources=$category&apiKey=$apiKey")
         // Actually makes the API call, blocking the thread until it completes
         val response = okHttpClient.newCall(request).execute()
 

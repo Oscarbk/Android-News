@@ -41,6 +41,7 @@ class SourcesAdapter(val sources: List<Source>) : RecyclerView.Adapter<SourcesAd
         holder.username.text = currentSource.username
         holder.content.text = currentSource.content
         holder.source.text = currentSource.source
+        holder.username.text = currentSource.username
 
         //holder.url.text = currentSource.url
         if (!currentSource.iconUrl.isNullOrBlank())
@@ -65,8 +66,9 @@ class SourcesAdapter(val sources: List<Source>) : RecyclerView.Adapter<SourcesAd
             }
             else {
                 val intent = Intent(holder.url.getContext(), ResultsActivity::class.java)
-                intent.putExtra("SOURCE", holder.source.text)
+                intent.putExtra("SOURCE", holder.username.text)
                 intent.putExtra("TERM", currentSource.term)
+                intent.putExtra("SOURCEID", currentSource.source)
                 holder.url.getContext().startActivity(intent)
             }
         }

@@ -209,6 +209,9 @@ class SourceActivity : AppCompatActivity() {
                 // Get the title of the article
                 val title = curr.getString("name")
 
+                // Get source ID
+                val source = curr.getString("id")
+
                 // Get the description
                 val description = curr.getString("description")
 
@@ -220,7 +223,7 @@ class SourceActivity : AppCompatActivity() {
                         Source(
                                 username = title,
                                 content = description,
-                                source = title,
+                                source = source,
                                 url = "goToResults",
                                 term = intent.getStringExtra("TERM")!!,
                                 iconUrl = ""
