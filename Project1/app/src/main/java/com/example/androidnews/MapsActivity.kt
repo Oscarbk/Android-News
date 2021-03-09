@@ -1,5 +1,6 @@
 package com.example.androidnews
 
+import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -65,6 +66,43 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
 
+        // Restore previous pin if one exists
+        val preferences = getSharedPreferences("androidnews", Context.MODE_PRIVATE)
+
+        val savedLat = preferences.getString("lat", "0.0")!!
+        val savedLon = preferences.getString("lon", "0.0")!!
+        val savedPost = preferences.getString("post", "false")!!
+        val savedLocation = preferences.getString("location", "false")!!
+        Log.d("maps", "Retrieved values: $savedLat and $savedLon and $savedPost and $savedLocation")
+
+        if (savedLocation != "false") {
+            val coords: LatLng = LatLng(savedLat.toDouble(), savedLon.toDouble())
+
+            mMap.addMarker(MarkerOptions().position(coords).title(savedPost))
+            mMap.moveCamera(CameraUpdateFactory.newLatLng(coords))
+
+            // Network call needs to be on another thread
+            doAsync {
+                try {
+                    val sources = retrieveSources(savedLocation)
+                    runOnUiThread {
+                        val adapter = sources?.let { SourcesAdapter(it) }
+                        recyclerView.adapter = adapter
+                        recyclerView.layoutManager = LinearLayoutManager(
+                                this@MapsActivity,
+                                LinearLayoutManager.HORIZONTAL,
+                                false
+                        )
+
+                    }
+                } catch (e: java.lang.Exception) {
+                    runOnUiThread {
+                        // TODO: Display error message if can't connect to the internet
+
+                    }
+                }
+            }
+        }
         mMap.setOnMapLongClickListener { coords: LatLng ->
             mMap.clear()
 
@@ -130,6 +168,16 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                         // Add a map marker where the user tapped and pan the camera over
                         mMap.addMarker(MarkerOptions().position(coords).title(postalAddress))
                         mMap.moveCamera(CameraUpdateFactory.newLatLng(coords))
+
+                        // Save the map marker
+                        preferences.edit()
+                            .putString("post", postalAddress)
+                            .putString("lat", coords.latitude.toString())
+                            .putString("lon", coords.longitude.toString())
+                            .putString("location", firstResult.adminArea)
+                            .apply()
+
+                        Log.d("maps", "Coordinates saved: ${coords.latitude.toString()} and ${coords.longitude.toString()}")
                     } else {
                         Log.d("MapsActivity", "No results from geocoder!")
                         val toast = Toast.makeText(

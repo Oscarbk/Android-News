@@ -1,6 +1,7 @@
 package com.example.androidnews
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
@@ -60,6 +61,9 @@ class HeadlinesActivity : AppCompatActivity() {
         prev = findViewById(R.id.prev)
         pageSomething = findViewById(R.id.currentPage)
 
+        val preferences = getSharedPreferences("androidnews", Context.MODE_PRIVATE)
+
+
         // TODO HERE: add parm to get articles function to select for categories
         Log.d("spin", "test")
         categories.setOnItemSelectedListener(object : OnItemSelectedListener {
@@ -67,13 +71,22 @@ class HeadlinesActivity : AppCompatActivity() {
                 // your code here
                 currentPage = 1
                 val text: String = categories.getSelectedItem().toString()
-                Log.d("spin", text)
+                val pos: String = categories.selectedItemPosition.toString()
+                Log.d("saved", "spinner selected: $text")
                 displayPage(text, currentPage)
                 // TODO: Fix colors
                 if (currentPage == maxPages) {
                     next.setTextColor(Color.GRAY)
                 }
                 prev.setTextColor(Color.GRAY)
+
+                if (text != "Business") {
+                    preferences.edit()
+                            .putString("category", text)
+                            .putString("position", pos)
+                            .apply()
+                    Log.d("saved", "What I saved: $text and $pos")
+                }
             }
 
             override fun onNothingSelected(parentView: AdapterView<*>?) {
@@ -82,7 +95,7 @@ class HeadlinesActivity : AppCompatActivity() {
             }
 
         })
-        displayPage("Business", currentPage)
+
         next.setTextColor(Color.BLUE)
         next.setOnClickListener {
             if (currentPage < maxPages) {
@@ -128,6 +141,12 @@ class HeadlinesActivity : AppCompatActivity() {
             // Apply the adapter to the spinner
             spinner.adapter = adapter
         }
+        val savedCategory = preferences.getString("category", "Business")!!
+        val savedPosition = preferences.getString("position", "0")!!
+        val pos = savedPosition.toInt()
+        Log.d("saved", "What I restored: $savedCategory and $pos")
+        categories.setSelection(pos)
+        displayPage(savedCategory, currentPage)
     }
     fun displayPage(category: String, page: Int)
     {
