@@ -13,6 +13,7 @@ import com.google.android.gms.maps.model.MarkerOptions
 import android.location.Address
 import android.location.Geocoder
 import android.util.Log
+import android.view.View
 import android.widget.*
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -28,6 +29,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var mMap: GoogleMap
     private lateinit var recyclerView: RecyclerView
+    private lateinit var clearArticles: Button
 
     // OkHttp is a library used to make network calls
     private val okHttpClient: OkHttpClient
@@ -50,8 +52,15 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
-
         recyclerView = findViewById(R.id.recyclerView)
+        clearArticles = findViewById(R.id.clearArticles)
+        clearArticles.visibility = View.GONE
+
+        clearArticles.setOnClickListener {
+            recyclerView.setAdapter(null)
+            clearArticles.visibility = View.GONE
+        }
+
     }
 
     /**
@@ -105,7 +114,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         }
         mMap.setOnMapLongClickListener { coords: LatLng ->
             mMap.clear()
-
+            clearArticles.visibility = View.VISIBLE
             doAsync {
                 // Geocoding should be done on a background thread - it involves networking
                 // and has the potential to cause the app to freeze (Application Not Responding error)
@@ -154,7 +163,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                                         LinearLayoutManager.HORIZONTAL,
                                         false
                                     )
-
                                 }
                             } catch (e: java.lang.Exception) {
                                 runOnUiThread {

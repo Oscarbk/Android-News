@@ -56,6 +56,7 @@ class SourceActivity : AppCompatActivity() {
             val intent = Intent(this, ResultsActivity::class.java)
             intent.putExtra("SOURCE", "All")
             intent.putExtra("TERM", term)
+            intent.putExtra("SOURCEID", "")
             startActivity(intent)
         }
 

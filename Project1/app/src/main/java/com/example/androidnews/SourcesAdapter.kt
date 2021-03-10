@@ -2,19 +2,16 @@ package com.example.androidnews
 
 import android.content.Intent
 import android.net.Uri
-import android.os.Bundle
+import android.util.DisplayMetrics
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.content.ContextCompat.startActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.squareup.picasso.Picasso
-import org.jetbrains.anko.internals.AnkoInternals.getContext
 
 
 class SourcesAdapter(val sources: List<Source>) : RecyclerView.Adapter<SourcesAdapter.ViewHolder>() {
@@ -43,13 +40,27 @@ class SourcesAdapter(val sources: List<Source>) : RecyclerView.Adapter<SourcesAd
         holder.source.text = currentSource.source
         holder.username.text = currentSource.username
 
+        if (holder.username.text == "null") holder.username.visibility = View.GONE
+        if (holder.content.text == "null") holder.content.visibility = View.GONE
+        if (holder.source.text == "null") holder.source.visibility = View.GONE
+
+
+
         //holder.url.text = currentSource.url
         if (!currentSource.iconUrl.isNullOrBlank())
         {
+            Log.d("image", currentSource.iconUrl)
+
             Picasso.get()
                 .load(currentSource.iconUrl)
+                .resize(0, 1024)
+                .onlyScaleDown()
                 .into(holder.icon)
+
+
+
         }
+        else holder.icon.visibility = View.GONE
 
         val test = currentSource.url
         holder.click.setOnClickListener(){//holder.url.setOnClickListener{

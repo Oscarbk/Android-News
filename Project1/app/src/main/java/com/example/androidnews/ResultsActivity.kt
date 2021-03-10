@@ -23,6 +23,7 @@ class ResultsActivity : AppCompatActivity() {
     private lateinit var categories: Spinner
     private lateinit var categoryLabel: TextView
     private lateinit var sourceLabel: TextView
+    private lateinit var skip: Button
 
     // OkHttp is a library used to make network calls
     private val okHttpClient: OkHttpClient
@@ -51,10 +52,12 @@ class ResultsActivity : AppCompatActivity() {
         categories = findViewById(R.id.spinner)
         categoryLabel = findViewById(R.id.category)
         sourceLabel = findViewById(R.id.sourceBox)
+        skip = findViewById(R.id.skip)
 
         categories.visibility = View.GONE
         categoryLabel.visibility = View.GONE
         sourceLabel.visibility = View.GONE
+        skip.visibility = View.GONE
 
         doAsync {
             val sources = retrieveSources(sourceID, term)
