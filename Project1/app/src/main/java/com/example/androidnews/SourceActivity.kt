@@ -216,8 +216,8 @@ class SourceActivity : AppCompatActivity() {
             skip.isEnabled = false
             categories.isEnabled = false
         }
-        val text: String = categories.getSelectedItem().toString()
         val apiKey = getString(R.string.api_key)
+        val text: String = categories.getSelectedItem().toString()
 
         // Building the request
         val request = Request.Builder()
