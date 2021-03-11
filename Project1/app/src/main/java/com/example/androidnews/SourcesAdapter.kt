@@ -49,8 +49,6 @@ class SourcesAdapter(val sources: List<Source>) : RecyclerView.Adapter<SourcesAd
         //holder.url.text = currentSource.url
         if (!currentSource.iconUrl.isNullOrBlank())
         {
-            Log.d("image", currentSource.iconUrl)
-
             Picasso.get()
                 .load(currentSource.iconUrl)
                 .resize(0, 1024)

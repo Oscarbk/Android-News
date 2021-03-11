@@ -85,11 +85,6 @@ class HeadlinesActivity : AppCompatActivity() {
                 val pos: String = categories.selectedItemPosition.toString()
                 Log.d("saved", "spinner selected: $text")
                 displayPage(text, currentPage)
-                // TODO: Fix colors
-                if (currentPage == maxPages) {
-                    next.setTextColor(Color.GRAY)
-                }
-                prev.setTextColor(Color.GRAY)
 
                 if (text != "Business") {
                     preferences.edit()
@@ -98,6 +93,13 @@ class HeadlinesActivity : AppCompatActivity() {
                             .apply()
                     Log.d("saved", "What I saved: $text and $pos")
                 }
+                // TODO: Fix colors
+                if (currentPage == maxPages) {
+                    next.setTextColor(Color.GRAY)
+                    Log.d("color", "current page = $currentPage and maxpage = $maxPages")
+                }
+                prev.setTextColor(Color.GRAY)
+                next.setTextColor(Color.BLUE)
             }
 
             override fun onNothingSelected(parentView: AdapterView<*>?) {
