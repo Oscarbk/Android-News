@@ -89,6 +89,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
             mMap.addMarker(MarkerOptions().position(coords).title(savedPost))
             mMap.moveCamera(CameraUpdateFactory.newLatLng(coords))
+            clearArticles.visibility = View.VISIBLE
 
             // Network call needs to be on another thread
             doAsync {
@@ -106,8 +107,13 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                     }
                 } catch (e: java.lang.Exception) {
                     runOnUiThread {
-                        // TODO: Display error message if can't connect to the internet
-
+                        // Display error message if can't connect to the internet
+                        val toast = Toast.makeText(
+                                this@MapsActivity,
+                                "Error: Could not connect to the internet",
+                                Toast.LENGTH_LONG
+                        )
+                        toast.show()
                     }
                 }
             }
@@ -131,6 +137,16 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                     )
                 } catch (e: Exception) {
                     Log.e("MapsActivity", "Geocoder failed", e)
+
+
+                    runOnUiThread {
+                        val toast = Toast.makeText(
+                                this@MapsActivity,
+                                "Error: Could not connect to Geocoder",
+                                Toast.LENGTH_LONG
+                        )
+                        toast.show()
+                    }
                     listOf<Address>()
                 }
 
@@ -166,8 +182,16 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                                 }
                             } catch (e: java.lang.Exception) {
                                 runOnUiThread {
-                                    // TODO: Display error message if can't connect to the internet
+                                    // Display error message if can't connect to the internet
 
+                                    runOnUiThread {
+                                        val toast = Toast.makeText(
+                                                this@MapsActivity,
+                                                "Error: Could not connect to the internet",
+                                                Toast.LENGTH_LONG
+                                        )
+                                        toast.show()
+                                    }
                                 }
                             }
                         }
