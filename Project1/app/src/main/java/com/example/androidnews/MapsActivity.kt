@@ -280,10 +280,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         val apiKey = getString(R.string.api_key)
         // Building the request
         val request = Request.Builder()
-            .url("https://newsapi.org/v2/everything?q=$location&sortBy=popularity&apiKey=$apiKey")
+            .url("https://newsapi.org/v2/everything?qInTitle=$location&sortBy=popularity&apiKey=$apiKey")
             .build()
-        Log.d("key", "My key = $apiKey")
-        Log.d("key", "My key = $apiKey")
 
         // Actually makes the API call, blocking the thread until it completes
         val response = okHttpClient.newCall(request).execute()
