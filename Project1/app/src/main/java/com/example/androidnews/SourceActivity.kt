@@ -25,6 +25,7 @@ class SourceActivity : AppCompatActivity() {
     private lateinit var recyclerView: RecyclerView
     private lateinit var categories: Spinner
     private lateinit var skip: Button
+    private lateinit var progressBar: ProgressBar
 
     // OkHttp is a library used to make network calls
     private val okHttpClient: OkHttpClient
@@ -51,6 +52,7 @@ class SourceActivity : AppCompatActivity() {
         recyclerView = findViewById(R.id.recyclerView)
         categories = findViewById(R.id.spinner)
         skip = findViewById(R.id.skip)
+        progressBar = findViewById(R.id.progressBar)
 
         if (!isOnline(this))
         {
@@ -61,6 +63,7 @@ class SourceActivity : AppCompatActivity() {
                     Toast.LENGTH_LONG
             )
             toast.show()
+            progressBar.visibility = View.GONE
         }
         else skip.setEnabled(true)
 
@@ -208,6 +211,11 @@ class SourceActivity : AppCompatActivity() {
     }
     fun retrieveSources(category: String): List<Source>
     {
+        runOnUiThread {
+            progressBar.visibility = View.VISIBLE
+            skip.isEnabled = false
+            categories.isEnabled = false
+        }
         val text: String = categories.getSelectedItem().toString()
         val apiKey = getString(R.string.api_key)
 
@@ -263,6 +271,11 @@ class SourceActivity : AppCompatActivity() {
                         )
                 )
             }
+        }
+        runOnUiThread {
+            progressBar.visibility = View.GONE
+            skip.isEnabled = true
+            categories.isEnabled = true
         }
         return sources
     }
