@@ -93,6 +93,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             mMap.addMarker(MarkerOptions().position(coords).title(savedPost))
             mMap.moveCamera(CameraUpdateFactory.newLatLng(coords))
             clearArticles.visibility = View.VISIBLE
+            setTitle("Search for $savedLocation")
 
             // Network call needs to be on another thread
             doAsync {
