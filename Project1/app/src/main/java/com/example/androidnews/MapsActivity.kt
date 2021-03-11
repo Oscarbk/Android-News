@@ -281,7 +281,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         val apiKey = getString(R.string.api_key)
         // Building the request
         val request = Request.Builder()
-            .url("https://newsapi.org/v2/everything?qInTitle=$location&sortBy=popularity&apiKey=$apiKey")
+            .url("https://newsapi.org/v2/everything?qInTitle=$location&language=en&sortBy=popularity&apiKey=$apiKey")
             .build()
 
         // Actually makes the API call, blocking the thread until it completes

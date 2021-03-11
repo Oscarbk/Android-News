@@ -144,7 +144,7 @@ class ResultsActivity : AppCompatActivity() {
 
         // Building the request
         val request = Request.Builder()
-                .url("https://newsapi.org/v2/everything?q=$term&sources=$category&apiKey=$apiKey")
+                .url("https://newsapi.org/v2/everything?q=$term&language=en&sources=$category&apiKey=$apiKey")
                 .build()
 
         Log.d("key", "My url: https://newsapi.org/v2/everything?q=$term&sources=$category&apiKey=$apiKey")
