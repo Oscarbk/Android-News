@@ -3,6 +3,8 @@ package com.example.androidnews
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Color
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -63,9 +65,18 @@ class HeadlinesActivity : AppCompatActivity() {
 
         val preferences = getSharedPreferences("androidnews", Context.MODE_PRIVATE)
 
+        if (!isOnline(this))
+        {
+            val toast = Toast.makeText(
+                    this,
+                    "Error: Could not connect to the internet",
+                    Toast.LENGTH_LONG
+            )
+            toast.show()
+        }
 
-        // TODO HERE: add parm to get articles function to select for categories
-        Log.d("spin", "test")
+
+
         categories.setOnItemSelectedListener(object : OnItemSelectedListener {
             override fun onItemSelected(parentView: AdapterView<*>?, selectedItemView: View?, position: Int, id: Long) {
                 // your code here
@@ -226,6 +237,29 @@ class HeadlinesActivity : AppCompatActivity() {
                 )
         )
     }*/
+
+    // Helper function to determine if there is an internet connection
+    // Provided by stackoverflow user Jorgesys
+    private fun isOnline(context: Context): Boolean {
+        val connectivityManager =
+                context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val capabilities =
+                connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork)
+        if (capabilities != null) {
+            if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)) {
+                Log.i("Internet", "NetworkCapabilities.TRANSPORT_CELLULAR")
+                return true
+            } else if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
+                Log.i("Internet", "NetworkCapabilities.TRANSPORT_WIFI")
+                return true
+            } else if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET)) {
+                Log.i("Internet", "NetworkCapabilities.TRANSPORT_ETHERNET")
+                return true
+            }
+        }
+        return false
+    }
+
     fun retrieveSources(category: String, page: Int): List<Source>
     {
 
@@ -269,7 +303,6 @@ class HeadlinesActivity : AppCompatActivity() {
 
                 val url = curr.getString("url")
 
-                // TODO: Get the thumbnail on check-in 3
                 val urlImage = curr.getString("urlToImage")
 
                 // Get the source

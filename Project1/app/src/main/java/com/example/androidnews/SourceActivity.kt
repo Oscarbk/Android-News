@@ -1,6 +1,9 @@
 package com.example.androidnews
 
+import android.content.Context
 import android.content.Intent
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -49,8 +52,17 @@ class SourceActivity : AppCompatActivity() {
         categories = findViewById(R.id.spinner)
         skip = findViewById(R.id.skip)
 
-        //TODO: set image to gone
-        //TODO: set source to gone since it's in the title
+        if (!isOnline(this))
+        {
+            skip.setEnabled(false)
+            val toast = Toast.makeText(
+                    this,
+                    "Error: Could not connect to the internet",
+                    Toast.LENGTH_LONG
+            )
+            toast.show()
+        }
+        else skip.setEnabled(true)
 
         skip.setOnClickListener {
             val intent = Intent(this, ResultsActivity::class.java)
@@ -174,6 +186,26 @@ class SourceActivity : AppCompatActivity() {
                 )
         )
     }*/
+    // Provided by stackoverflow user Jorgesys
+    private fun isOnline(context: Context): Boolean {
+        val connectivityManager =
+                context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val capabilities =
+                connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork)
+        if (capabilities != null) {
+            if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)) {
+                Log.i("Internet", "NetworkCapabilities.TRANSPORT_CELLULAR")
+                return true
+            } else if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
+                Log.i("Internet", "NetworkCapabilities.TRANSPORT_WIFI")
+                return true
+            } else if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET)) {
+                Log.i("Internet", "NetworkCapabilities.TRANSPORT_ETHERNET")
+                return true
+            }
+        }
+        return false
+    }
     fun retrieveSources(category: String): List<Source>
     {
         val text: String = categories.getSelectedItem().toString()
