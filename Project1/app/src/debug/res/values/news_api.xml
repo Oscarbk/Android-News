@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!--Made two api keys since I maxed out on one account-->
-    <!--<string name="api_key">apiKey=bdc116a1bab1437fbd328fe64fe80558</string>-->
+        <!--<string name="api_key">bdc116a1bab1437fbd328fe64fe80558</string>-->
     <string name="api_key">d3387c95f61240d4a720b19f0623fbfc</string>
 </resources>

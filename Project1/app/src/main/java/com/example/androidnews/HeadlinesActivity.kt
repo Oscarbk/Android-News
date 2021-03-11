@@ -1,7 +1,8 @@
 package com.example.androidnews
 
+import android.annotation.SuppressLint
 import android.content.Context
-import android.content.Intent
+import android.graphics.Color
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Bundle
@@ -18,13 +19,20 @@ import okhttp3.Request
 import okhttp3.logging.HttpLoggingInterceptor
 import org.jetbrains.anko.doAsync
 import org.json.JSONObject
+import org.w3c.dom.Text
+import kotlin.math.max
 
 
-class SourceActivity : AppCompatActivity() {
+class HeadlinesActivity : AppCompatActivity() {
+
+    private var currentPage = 1
+    private var maxPages = 0
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var categories: Spinner
-    private lateinit var skip: Button
+    private lateinit var prev: TextView
+    private lateinit var next: TextView
+    private lateinit var pageSomething: TextView
     private lateinit var progressBar: ProgressBar
 
     // OkHttp is a library used to make network calls
@@ -41,73 +49,96 @@ class SourceActivity : AppCompatActivity() {
 
     }
 
+    @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_source)
+        setContentView(R.layout.activity_headlines)
 
         val intent = getIntent()
-        val term: String = intent.getStringExtra("TERM")!!
-        setTitle("Search for $term")
+        //val term: String = intent.getStringExtra("TERM")!!
+        setTitle("Top Headlines")
 
         recyclerView = findViewById(R.id.recyclerView)
         categories = findViewById(R.id.spinner)
-        skip = findViewById(R.id.skip)
-        progressBar = findViewById(R.id.progressBar)
+        next = findViewById(R.id.next)
+        prev = findViewById(R.id.prev)
+        pageSomething = findViewById(R.id.currentPage)
+        progressBar = findViewById(R.id.progressBar2)
+
+        val preferences = getSharedPreferences("androidnews", Context.MODE_PRIVATE)
 
         if (!isOnline(this))
         {
-            skip.setEnabled(false)
             val toast = Toast.makeText(
                     this,
                     "Error: Could not connect to the internet",
                     Toast.LENGTH_LONG
             )
             toast.show()
-            progressBar.visibility = View.GONE
-        }
-        else skip.setEnabled(true)
-
-        skip.setOnClickListener {
-            val intent = Intent(this, ResultsActivity::class.java)
-            intent.putExtra("SOURCE", "All")
-            intent.putExtra("TERM", term)
-            intent.putExtra("SOURCEID", "")
-            startActivity(intent)
         }
 
-        // TODO HERE: add parm to get articles function to select for categories
-        Log.d("spin", "test")
-            categories.setOnItemSelectedListener(object : OnItemSelectedListener {
-                override fun onItemSelected(parentView: AdapterView<*>?, selectedItemView: View?, position: Int, id: Long) {
-                    // your code here
-                    Log.d("spin", "1")
-                    val text: String = categories.getSelectedItem().toString()
-                    Log.d("spin", "$text")
-                    doAsync {
-                        val sources = retrieveSources(text)
-                        runOnUiThread {
-                            val adapter = SourcesAdapter(sources)
-                            recyclerView.adapter = adapter
-                            recyclerView.layoutManager = LinearLayoutManager(this@SourceActivity)
-                        }
-                    }
+        categories.setOnItemSelectedListener(object : OnItemSelectedListener {
+            override fun onItemSelected(parentView: AdapterView<*>?, selectedItemView: View?, position: Int, id: Long) {
+                // your code here
+                currentPage = 1
+                val text: String = categories.getSelectedItem().toString()
+                val pos: String = categories.selectedItemPosition.toString()
+                Log.d("saved", "spinner selected: $text")
+                displayPage(text, currentPage)
+
+                if (text != "Business") {
+                    preferences.edit()
+                            .putString("category", text)
+                            .putString("position", pos)
+                            .apply()
+                    Log.d("saved", "What I saved: $text and $pos")
                 }
-
-                override fun onNothingSelected(parentView: AdapterView<*>?) {
-                    // your code here
-                    Log.d("spin", "2")
-
+                // TODO: Fix colors
+                if (currentPage == maxPages) {
+                    next.setTextColor(Color.GRAY)
+                    Log.d("color", "current page = $currentPage and maxpage = $maxPages")
                 }
-
-            })
-        //val sources = getFakeSources()
-        doAsync {
-            val sources = retrieveSources("Business")
-            runOnUiThread {
-                val adapter = SourcesAdapter(sources)
-                recyclerView.adapter = adapter
-                recyclerView.layoutManager = LinearLayoutManager(this@SourceActivity)
+                prev.setTextColor(Color.GRAY)
+                next.setTextColor(Color.BLUE)
             }
+
+            override fun onNothingSelected(parentView: AdapterView<*>?) {
+                // your code here
+                Log.d("spin", "2")
+            }
+
+        })
+
+        next.setTextColor(Color.BLUE)
+        next.setOnClickListener {
+            if (currentPage < maxPages) {
+                currentPage++
+                displayPage(categories.getSelectedItem().toString(), currentPage)
+                if (currentPage == maxPages)
+                    next.setTextColor(Color.GRAY)
+                prev.setTextColor(Color.BLUE)
+            }
+            else
+            {
+                return@setOnClickListener
+            }
+            Log.d("page", "current page is $currentPage")
+        }
+        prev.setOnClickListener {
+            if (currentPage > 1) {
+                currentPage--
+                displayPage(categories.getSelectedItem().toString(), currentPage)
+                if (currentPage == 1)
+                    // TODO: This can be done better
+                    prev.setTextColor(Color.GRAY)
+                next.setTextColor(Color.BLUE)
+            }
+
+            else
+            {
+                return@setOnClickListener
+            }
+            Log.d("page", "current page is $currentPage")
         }
 
         // The following code snippet is adapted from the android developer documentation on Spinners
@@ -122,6 +153,25 @@ class SourceActivity : AppCompatActivity() {
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
             // Apply the adapter to the spinner
             spinner.adapter = adapter
+        }
+        val savedCategory = preferences.getString("category", "Business")!!
+        val savedPosition = preferences.getString("position", "0")!!
+        val pos = savedPosition.toInt()
+        Log.d("saved", "What I restored: $savedCategory and $pos")
+        categories.setSelection(pos)
+        displayPage(savedCategory, currentPage)
+    }
+    fun displayPage(category: String, page: Int)
+    {
+        doAsync {
+            val sources = retrieveSources(category, page)
+            runOnUiThread {
+                val adapter = SourcesAdapter(sources)
+                recyclerView.adapter = adapter
+                recyclerView.layoutManager = LinearLayoutManager(this@HeadlinesActivity)
+                val update = "$currentPage / $maxPages"
+                pageSomething.text = update
+            }
         }
     }
     /*fun getFakeSources(): List<Source> {
@@ -189,6 +239,8 @@ class SourceActivity : AppCompatActivity() {
                 )
         )
     }*/
+
+    // Helper function to determine if there is an internet connection
     // Provided by stackoverflow user Jorgesys
     private fun isOnline(context: Context): Boolean {
         val connectivityManager =
@@ -209,22 +261,23 @@ class SourceActivity : AppCompatActivity() {
         }
         return false
     }
-    fun retrieveSources(category: String): List<Source>
+
+    fun retrieveSources(category: String, page: Int): List<Source>
     {
-        runOnUiThread {
+        runOnUiThread{
             progressBar.visibility = View.VISIBLE
-            skip.isEnabled = false
             categories.isEnabled = false
+            next.isEnabled = false
+            prev.isEnabled = false
         }
-        val text: String = categories.getSelectedItem().toString()
         val apiKey = getString(R.string.api_key)
 
         // Building the request
         val request = Request.Builder()
-                .url("https://newsapi.org/v2/sources?category=$category&language=en&apiKey=$apiKey")
+                .url("https://newsapi.org/v2/top-headlines?country=US&category=$category&page=$page&apiKey=$apiKey")
                 .build()
 
-        Log.d("key", "My url: https://newsapi.org/v2/sources?category=$category&language=en&apiKey=$apiKey")
+        Log.d("headlines", "My url: https://newsapi.org/v2/top-headlines?country=US&category=$category&apiKey=$apiKey")
         // Actually makes the API call, blocking the thread until it completes
         val response = okHttpClient.newCall(request).execute()
 
@@ -240,7 +293,9 @@ class SourceActivity : AppCompatActivity() {
             val json = JSONObject(responseString)
 
             // Grab the "articles" array from the root level
-            val articles = json.getJSONArray("sources")
+            val articles = json.getJSONArray("articles")
+
+            maxPages = json.getString("totalResults").toInt() / 20 + 1
 
             // Loop over the sources
             for (i in 0 until articles.length()) {
@@ -248,34 +303,34 @@ class SourceActivity : AppCompatActivity() {
                 val curr = articles.getJSONObject(i)
 
                 // Get the title of the article
-                val title = curr.getString("name")
-
-                // Get source ID
-                val source = curr.getString("id")
+                val title = curr.getString("title")
 
                 // Get the description
                 val description = curr.getString("description")
 
                 val url = curr.getString("url")
 
-                // TODO: Get the thumbnail on check-in 3
+                val urlImage = curr.getString("urlToImage")
 
+                // Get the source
+                val source = curr.getJSONObject("source").getString("name")
                 sources.add(
                         Source(
                                 username = title,
                                 content = description,
                                 source = source,
-                                url = "goToResults",
-                                term = intent.getStringExtra("TERM")!!,
-                                iconUrl = ""
+                                url = url,
+                                term = "",
+                                iconUrl = urlImage
                         )
                 )
             }
         }
-        runOnUiThread {
+        runOnUiThread{
             progressBar.visibility = View.GONE
-            skip.isEnabled = true
             categories.isEnabled = true
+            next.isEnabled = true
+            prev.isEnabled = true
         }
         return sources
     }

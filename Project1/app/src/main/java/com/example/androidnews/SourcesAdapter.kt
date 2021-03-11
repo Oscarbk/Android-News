@@ -2,17 +2,16 @@ package com.example.androidnews
 
 import android.content.Intent
 import android.net.Uri
-import android.os.Bundle
+import android.util.DisplayMetrics
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.content.ContextCompat.startActivity
 import androidx.recyclerview.widget.RecyclerView
-import org.jetbrains.anko.internals.AnkoInternals.getContext
+import com.squareup.picasso.Picasso
 
 
 class SourcesAdapter(val sources: List<Source>) : RecyclerView.Adapter<SourcesAdapter.ViewHolder>() {
@@ -39,21 +38,48 @@ class SourcesAdapter(val sources: List<Source>) : RecyclerView.Adapter<SourcesAd
         holder.username.text = currentSource.username
         holder.content.text = currentSource.content
         holder.source.text = currentSource.source
+        holder.username.text = currentSource.username
+
+        if (holder.username.text == "null") holder.username.visibility = View.GONE
+        if (holder.content.text == "null") holder.content.visibility = View.GONE
+        if (holder.source.text == "null") holder.source.visibility = View.GONE
+
+
 
         //holder.url.text = currentSource.url
+        if (!currentSource.iconUrl.isNullOrBlank())
+        {
+            Picasso.get()
+                .load(currentSource.iconUrl)
+                .resize(0, 1024)
+                .onlyScaleDown()
+                .into(holder.icon)
+
+
+
+        }
+        else holder.icon.visibility = View.GONE
 
         val test = currentSource.url
         holder.click.setOnClickListener(){//holder.url.setOnClickListener{
-            Log.d("BUTTON", "Button was clicked: $test")
+            Log.d("BUTTON", "Was URL passed: ${currentSource.iconUrl}")
             // TODO: come back to this
 
-            val url = test
-            val intent = Intent(Intent.ACTION_VIEW)
-            intent.data = Uri.parse(url)
-            holder.url.getContext().startActivity(intent)
 
-            /*val intent = Intent(holder.url.getContext(), MainActivity:: class.java)
-            holder.url.getContext().startActivity(intent)*/
+
+            val url = test
+            if (url != "goToResults") {
+                val intent = Intent(Intent.ACTION_VIEW)
+                intent.data = Uri.parse(url)
+                holder.url.getContext().startActivity(intent)
+            }
+            else {
+                val intent = Intent(holder.url.getContext(), ResultsActivity::class.java)
+                intent.putExtra("SOURCE", holder.username.text)
+                intent.putExtra("TERM", currentSource.term)
+                intent.putExtra("SOURCEID", currentSource.source)
+                holder.url.getContext().startActivity(intent)
+            }
         }
     }
     override fun getItemCount(): Int {
@@ -68,6 +94,7 @@ class SourcesAdapter(val sources: List<Source>) : RecyclerView.Adapter<SourcesAd
         val url: TextView = itemView.findViewById(R.id.url)
         //val url: Button = itemView.findViewById(R.id.url)
         val click: ConstraintLayout = itemView.findViewById(R.id.card_view_layout)
+        val icon: ImageView = itemView.findViewById(R.id.image)
     }
 
 }

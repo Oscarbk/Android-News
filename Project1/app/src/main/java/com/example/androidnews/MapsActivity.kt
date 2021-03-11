@@ -1,5 +1,6 @@
 package com.example.androidnews
 
+import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -12,6 +13,7 @@ import com.google.android.gms.maps.model.MarkerOptions
 import android.location.Address
 import android.location.Geocoder
 import android.util.Log
+import android.view.View
 import android.widget.*
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -27,6 +29,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var mMap: GoogleMap
     private lateinit var recyclerView: RecyclerView
+    private lateinit var clearArticles: Button
+    private lateinit var progressBar: ProgressBar
 
     // OkHttp is a library used to make network calls
     private val okHttpClient: OkHttpClient
@@ -49,8 +53,17 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
-
         recyclerView = findViewById(R.id.recyclerView)
+        clearArticles = findViewById(R.id.clearArticles)
+        progressBar = findViewById(R.id.progressBar3)
+        clearArticles.visibility = View.GONE
+        progressBar.visibility = View.GONE
+
+        clearArticles.setOnClickListener {
+            recyclerView.setAdapter(null)
+            clearArticles.visibility = View.GONE
+        }
+
     }
 
     /**
@@ -65,9 +78,53 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
 
+        // Restore previous pin if one exists
+        val preferences = getSharedPreferences("androidnews", Context.MODE_PRIVATE)
+
+        val savedLat = preferences.getString("lat", "0.0")!!
+        val savedLon = preferences.getString("lon", "0.0")!!
+        val savedPost = preferences.getString("post", "false")!!
+        val savedLocation = preferences.getString("location", "false")!!
+        Log.d("maps", "Retrieved values: $savedLat and $savedLon and $savedPost and $savedLocation")
+
+        if (savedLocation != "false") {
+            val coords: LatLng = LatLng(savedLat.toDouble(), savedLon.toDouble())
+
+            mMap.addMarker(MarkerOptions().position(coords).title(savedPost))
+            mMap.moveCamera(CameraUpdateFactory.newLatLng(coords))
+            clearArticles.visibility = View.VISIBLE
+            setTitle("Search for $savedLocation")
+
+            // Network call needs to be on another thread
+            doAsync {
+                try {
+                    val sources = retrieveSources(savedLocation)
+                    runOnUiThread {
+                        val adapter = sources?.let { SourcesAdapter(it) }
+                        recyclerView.adapter = adapter
+                        recyclerView.layoutManager = LinearLayoutManager(
+                                this@MapsActivity,
+                                LinearLayoutManager.HORIZONTAL,
+                                false
+                        )
+
+                    }
+                } catch (e: java.lang.Exception) {
+                    runOnUiThread {
+                        // Display error message if can't connect to the internet
+                        val toast = Toast.makeText(
+                                this@MapsActivity,
+                                "Error: Could not connect to the internet",
+                                Toast.LENGTH_LONG
+                        )
+                        toast.show()
+                    }
+                }
+            }
+        }
         mMap.setOnMapLongClickListener { coords: LatLng ->
             mMap.clear()
-
+            clearArticles.visibility = View.VISIBLE
             doAsync {
                 // Geocoding should be done on a background thread - it involves networking
                 // and has the potential to cause the app to freeze (Application Not Responding error)
@@ -84,6 +141,16 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                     )
                 } catch (e: Exception) {
                     Log.e("MapsActivity", "Geocoder failed", e)
+
+
+                    runOnUiThread {
+                        val toast = Toast.makeText(
+                                this@MapsActivity,
+                                "Error: Could not connect to Geocoder",
+                                Toast.LENGTH_LONG
+                        )
+                        toast.show()
+                    }
                     listOf<Address>()
                 }
 
@@ -116,12 +183,19 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                                         LinearLayoutManager.HORIZONTAL,
                                         false
                                     )
-
                                 }
                             } catch (e: java.lang.Exception) {
                                 runOnUiThread {
-                                    // TODO: Display error message if can't connect to the internet
+                                    // Display error message if can't connect to the internet
 
+                                    runOnUiThread {
+                                        val toast = Toast.makeText(
+                                                this@MapsActivity,
+                                                "Error: Could not connect to the internet",
+                                                Toast.LENGTH_LONG
+                                        )
+                                        toast.show()
+                                    }
                                 }
                             }
                         }
@@ -130,6 +204,16 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                         // Add a map marker where the user tapped and pan the camera over
                         mMap.addMarker(MarkerOptions().position(coords).title(postalAddress))
                         mMap.moveCamera(CameraUpdateFactory.newLatLng(coords))
+
+                        // Save the map marker
+                        preferences.edit()
+                            .putString("post", postalAddress)
+                            .putString("lat", coords.latitude.toString())
+                            .putString("lon", coords.longitude.toString())
+                            .putString("location", firstResult.adminArea)
+                            .apply()
+
+                        Log.d("maps", "Coordinates saved: ${coords.latitude.toString()} and ${coords.longitude.toString()}")
                     } else {
                         Log.d("MapsActivity", "No results from geocoder!")
                         val toast = Toast.makeText(
@@ -191,13 +275,14 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     // This function must be called from a background thread since it will be doing some networking
     fun retrieveSources(location: String): List<Source>?
     {
+        runOnUiThread {
+            progressBar.visibility = View.VISIBLE
+        }
         val apiKey = getString(R.string.api_key)
         // Building the request
         val request = Request.Builder()
-            .url("https://newsapi.org/v2/everything?q=$location&sortBy=popularity&apiKey=$apiKey")
+            .url("https://newsapi.org/v2/everything?qInTitle=$location&sortBy=popularity&apiKey=$apiKey")
             .build()
-        Log.d("key", "My key = $apiKey")
-        Log.d("key", "My key = $apiKey")
 
         // Actually makes the API call, blocking the thread until it completes
         val response = okHttpClient.newCall(request).execute()
@@ -233,6 +318,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 val url = curr.getString("url")
 
                 // TODO: Get the thumbnail on check-in 3
+                val urlImage = curr.getString("urlToImage")
 
                 sources.add(
                     Source(
@@ -240,10 +326,14 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                         content = description,
                         source = source,
                         url = url,
+                        term = "",
+                        iconUrl = urlImage
                     )
                 )
-
             }
+        }
+        runOnUiThread {
+            progressBar.visibility = View.GONE
         }
         return sources
     }

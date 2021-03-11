@@ -1,9 +1,5 @@
 package com.example.androidnews
 
-import android.content.Context
-import android.content.Intent
-import android.net.ConnectivityManager
-import android.net.NetworkCapabilities
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -18,12 +14,15 @@ import okhttp3.Request
 import okhttp3.logging.HttpLoggingInterceptor
 import org.jetbrains.anko.doAsync
 import org.json.JSONObject
+import org.w3c.dom.Text
 
 
-class SourceActivity : AppCompatActivity() {
+class ResultsActivity : AppCompatActivity() {
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var categories: Spinner
+    private lateinit var categoryLabel: TextView
+    private lateinit var sourceLabel: TextView
     private lateinit var skip: Button
     private lateinit var progressBar: ProgressBar
 
@@ -38,7 +37,6 @@ class SourceActivity : AppCompatActivity() {
         builder.addInterceptor(logging)
 
         okHttpClient = builder.build()
-
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -46,82 +44,30 @@ class SourceActivity : AppCompatActivity() {
         setContentView(R.layout.activity_source)
 
         val intent = getIntent()
+        val source: String = intent.getStringExtra("SOURCE")!!
         val term: String = intent.getStringExtra("TERM")!!
-        setTitle("Search for $term")
+        val sourceID: String = intent.getStringExtra("SOURCEID")!!
+        setTitle("$source results for $term")
 
         recyclerView = findViewById(R.id.recyclerView)
         categories = findViewById(R.id.spinner)
+        categoryLabel = findViewById(R.id.category)
+        sourceLabel = findViewById(R.id.sourceBox)
         skip = findViewById(R.id.skip)
         progressBar = findViewById(R.id.progressBar)
 
-        if (!isOnline(this))
-        {
-            skip.setEnabled(false)
-            val toast = Toast.makeText(
-                    this,
-                    "Error: Could not connect to the internet",
-                    Toast.LENGTH_LONG
-            )
-            toast.show()
-            progressBar.visibility = View.GONE
-        }
-        else skip.setEnabled(true)
+        categories.visibility = View.GONE
+        categoryLabel.visibility = View.GONE
+        sourceLabel.visibility = View.GONE
+        skip.visibility = View.GONE
 
-        skip.setOnClickListener {
-            val intent = Intent(this, ResultsActivity::class.java)
-            intent.putExtra("SOURCE", "All")
-            intent.putExtra("TERM", term)
-            intent.putExtra("SOURCEID", "")
-            startActivity(intent)
-        }
-
-        // TODO HERE: add parm to get articles function to select for categories
-        Log.d("spin", "test")
-            categories.setOnItemSelectedListener(object : OnItemSelectedListener {
-                override fun onItemSelected(parentView: AdapterView<*>?, selectedItemView: View?, position: Int, id: Long) {
-                    // your code here
-                    Log.d("spin", "1")
-                    val text: String = categories.getSelectedItem().toString()
-                    Log.d("spin", "$text")
-                    doAsync {
-                        val sources = retrieveSources(text)
-                        runOnUiThread {
-                            val adapter = SourcesAdapter(sources)
-                            recyclerView.adapter = adapter
-                            recyclerView.layoutManager = LinearLayoutManager(this@SourceActivity)
-                        }
-                    }
-                }
-
-                override fun onNothingSelected(parentView: AdapterView<*>?) {
-                    // your code here
-                    Log.d("spin", "2")
-
-                }
-
-            })
-        //val sources = getFakeSources()
         doAsync {
-            val sources = retrieveSources("Business")
+            val sources = retrieveSources(sourceID, term)
             runOnUiThread {
                 val adapter = SourcesAdapter(sources)
                 recyclerView.adapter = adapter
-                recyclerView.layoutManager = LinearLayoutManager(this@SourceActivity)
+                recyclerView.layoutManager = LinearLayoutManager(this@ResultsActivity)
             }
-        }
-
-        // The following code snippet is adapted from the android developer documentation on Spinners
-        val spinner: Spinner = findViewById(R.id.spinner)
-        // Create an ArrayAdapter using the string array and a default spinner layout
-        ArrayAdapter.createFromResource(
-                this,
-                R.array.sources_array,
-                android.R.layout.simple_spinner_item
-        ).also { adapter ->
-            // Specify the layout to use when the list of choices appears
-            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-            // Apply the adapter to the spinner
-            spinner.adapter = adapter
         }
     }
     /*fun getFakeSources(): List<Source> {
@@ -189,42 +135,19 @@ class SourceActivity : AppCompatActivity() {
                 )
         )
     }*/
-    // Provided by stackoverflow user Jorgesys
-    private fun isOnline(context: Context): Boolean {
-        val connectivityManager =
-                context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        val capabilities =
-                connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork)
-        if (capabilities != null) {
-            if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)) {
-                Log.i("Internet", "NetworkCapabilities.TRANSPORT_CELLULAR")
-                return true
-            } else if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
-                Log.i("Internet", "NetworkCapabilities.TRANSPORT_WIFI")
-                return true
-            } else if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET)) {
-                Log.i("Internet", "NetworkCapabilities.TRANSPORT_ETHERNET")
-                return true
-            }
-        }
-        return false
-    }
-    fun retrieveSources(category: String): List<Source>
+    fun retrieveSources(category: String, term: String): List<Source>
     {
         runOnUiThread {
             progressBar.visibility = View.VISIBLE
-            skip.isEnabled = false
-            categories.isEnabled = false
         }
-        val text: String = categories.getSelectedItem().toString()
         val apiKey = getString(R.string.api_key)
 
         // Building the request
         val request = Request.Builder()
-                .url("https://newsapi.org/v2/sources?category=$category&language=en&apiKey=$apiKey")
+                .url("https://newsapi.org/v2/everything?q=$term&sources=$category&apiKey=$apiKey")
                 .build()
 
-        Log.d("key", "My url: https://newsapi.org/v2/sources?category=$category&language=en&apiKey=$apiKey")
+        Log.d("key", "My url: https://newsapi.org/v2/everything?q=$term&sources=$category&apiKey=$apiKey")
         // Actually makes the API call, blocking the thread until it completes
         val response = okHttpClient.newCall(request).execute()
 
@@ -240,18 +163,18 @@ class SourceActivity : AppCompatActivity() {
             val json = JSONObject(responseString)
 
             // Grab the "articles" array from the root level
-            val articles = json.getJSONArray("sources")
+            val articles = json.getJSONArray("articles")
 
             // Loop over the sources
             for (i in 0 until articles.length()) {
                 // Grab the current article
                 val curr = articles.getJSONObject(i)
 
-                // Get the title of the article
-                val title = curr.getString("name")
+                val source = curr.getJSONObject("source").getString("name")
 
-                // Get source ID
-                val source = curr.getString("id")
+
+                // Get the title of the article
+                val title = curr.getString("title")
 
                 // Get the description
                 val description = curr.getString("description")
@@ -259,23 +182,21 @@ class SourceActivity : AppCompatActivity() {
                 val url = curr.getString("url")
 
                 // TODO: Get the thumbnail on check-in 3
-
+                val urlImage = curr.getString("urlToImage")
                 sources.add(
                         Source(
                                 username = title,
                                 content = description,
                                 source = source,
-                                url = "goToResults",
+                                url = url,
                                 term = intent.getStringExtra("TERM")!!,
-                                iconUrl = ""
+                                iconUrl = urlImage
                         )
                 )
             }
         }
         runOnUiThread {
             progressBar.visibility = View.GONE
-            skip.isEnabled = true
-            categories.isEnabled = true
         }
         return sources
     }
