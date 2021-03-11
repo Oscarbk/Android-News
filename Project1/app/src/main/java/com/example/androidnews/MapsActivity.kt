@@ -30,6 +30,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var mMap: GoogleMap
     private lateinit var recyclerView: RecyclerView
     private lateinit var clearArticles: Button
+    private lateinit var progressBar: ProgressBar
 
     // OkHttp is a library used to make network calls
     private val okHttpClient: OkHttpClient
@@ -54,7 +55,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         mapFragment.getMapAsync(this)
         recyclerView = findViewById(R.id.recyclerView)
         clearArticles = findViewById(R.id.clearArticles)
+        progressBar = findViewById(R.id.progressBar3)
         clearArticles.visibility = View.GONE
+        progressBar.visibility = View.GONE
 
         clearArticles.setOnClickListener {
             recyclerView.setAdapter(null)
@@ -271,6 +274,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     // This function must be called from a background thread since it will be doing some networking
     fun retrieveSources(location: String): List<Source>?
     {
+        runOnUiThread {
+            progressBar.visibility = View.VISIBLE
+        }
         val apiKey = getString(R.string.api_key)
         // Building the request
         val request = Request.Builder()
@@ -326,6 +332,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                     )
                 )
             }
+        }
+        runOnUiThread {
+            progressBar.visibility = View.GONE
         }
         return sources
     }

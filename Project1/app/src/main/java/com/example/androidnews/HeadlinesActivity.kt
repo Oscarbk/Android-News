@@ -33,6 +33,7 @@ class HeadlinesActivity : AppCompatActivity() {
     private lateinit var prev: TextView
     private lateinit var next: TextView
     private lateinit var pageSomething: TextView
+    private lateinit var progressBar: ProgressBar
 
     // OkHttp is a library used to make network calls
     private val okHttpClient: OkHttpClient
@@ -62,6 +63,7 @@ class HeadlinesActivity : AppCompatActivity() {
         next = findViewById(R.id.next)
         prev = findViewById(R.id.prev)
         pageSomething = findViewById(R.id.currentPage)
+        progressBar = findViewById(R.id.progressBar2)
 
         val preferences = getSharedPreferences("androidnews", Context.MODE_PRIVATE)
 
@@ -74,8 +76,6 @@ class HeadlinesActivity : AppCompatActivity() {
             )
             toast.show()
         }
-
-
 
         categories.setOnItemSelectedListener(object : OnItemSelectedListener {
             override fun onItemSelected(parentView: AdapterView<*>?, selectedItemView: View?, position: Int, id: Long) {
@@ -262,7 +262,12 @@ class HeadlinesActivity : AppCompatActivity() {
 
     fun retrieveSources(category: String, page: Int): List<Source>
     {
-
+        runOnUiThread{
+            progressBar.visibility = View.VISIBLE
+            categories.isEnabled = false
+            next.isEnabled = false
+            prev.isEnabled = false
+        }
         val apiKey = getString(R.string.api_key)
 
         // Building the request
@@ -318,6 +323,12 @@ class HeadlinesActivity : AppCompatActivity() {
                         )
                 )
             }
+        }
+        runOnUiThread{
+            progressBar.visibility = View.GONE
+            categories.isEnabled = true
+            next.isEnabled = true
+            prev.isEnabled = true
         }
         return sources
     }

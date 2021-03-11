@@ -24,6 +24,7 @@ class ResultsActivity : AppCompatActivity() {
     private lateinit var categoryLabel: TextView
     private lateinit var sourceLabel: TextView
     private lateinit var skip: Button
+    private lateinit var progressBar: ProgressBar
 
     // OkHttp is a library used to make network calls
     private val okHttpClient: OkHttpClient
@@ -53,6 +54,7 @@ class ResultsActivity : AppCompatActivity() {
         categoryLabel = findViewById(R.id.category)
         sourceLabel = findViewById(R.id.sourceBox)
         skip = findViewById(R.id.skip)
+        progressBar = findViewById(R.id.progressBar)
 
         categories.visibility = View.GONE
         categoryLabel.visibility = View.GONE
@@ -135,7 +137,9 @@ class ResultsActivity : AppCompatActivity() {
     }*/
     fun retrieveSources(category: String, term: String): List<Source>
     {
-
+        runOnUiThread {
+            progressBar.visibility = View.VISIBLE
+        }
         val apiKey = getString(R.string.api_key)
 
         // Building the request
@@ -190,6 +194,9 @@ class ResultsActivity : AppCompatActivity() {
                         )
                 )
             }
+        }
+        runOnUiThread {
+            progressBar.visibility = View.GONE
         }
         return sources
     }
