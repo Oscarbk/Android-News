@@ -7,7 +7,3 @@ Android News is a simple app to aggregate news from multiple sources. It can be 
 3. Clean up code - redundant code in some place
 4. Remove api key from commit history
 5. Could use cardView instead of buttons
-
-Note for pull request: Clicking on a source in the sourceActivity page will take you to the the source's website. Leaving as is since the results page does not need to be implemented yet
-
-View the [Project Requirements Document](https://docs.google.com/document/d/1MO1TWz6bV4NkF4b1XmASTNOjr85CupTq13rIqpE5IeU/edit?usp=sharing) for full details!
