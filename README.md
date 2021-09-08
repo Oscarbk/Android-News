@@ -23,7 +23,7 @@ Android News is a simple app to aggregate news from multiple sources. It can be 
   <img src="./Screenshots/MapsActivity_Launch.png" width="200" />
   <img src="./Screenshots/MapsActivity_ClickedOn_Texas.png" width="200" />
 </p>
-<p align="middle">Search by location launches a world map where a user can tap anywhere on the world to get news from a specified region. User can then swipe left to scroll through all fetched articles for their selected region. The news articles fetched is also based on the device's default language setting. E.g. Clicking on Barcelona, Spain will yield English articles for English users and Spanish articles for Spanish users</>
+<p align="middle">Search by location launches a world map where a user can tap anywhere on the world to get news from a specified region. User can then swipe left to scroll through all fetched articles for their selected region. News articles fetched will always default to English results</>
   
 ----
 
